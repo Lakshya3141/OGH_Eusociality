@@ -9,7 +9,8 @@
 #define Haplotype_hpp
 
 #include "Parameters.hpp"
-#include <Eigen/Dense>
+#include "Random.hpp"
+//#include <Eigen/Dense>
 
 class Haplotype {
     public:
@@ -24,37 +25,25 @@ class Haplotype {
 
 double Haplotype::initialise_genes_dispersal() {
     double temp_disp;
-    disp = dInitDispersal;
-    return disp;
+    temp_disp = dInitDispersal;
+    return temp_disp;
 }
 
 std::array<double, 2> Haplotype::initialise_genes_growth() {
-    std::array<double, 2> temp_genes {dInitGrowthIntercept, dInitGrowthSlope};
+    std::array<double, 2> temp_genes = {dInitGrowthIntercept, dInitGrowthSlope};
     return temp_genes;
 }
 
 void Haplotype::mutate() {
+    // For now, the mutation bias is 1 and hence mutation occurs at every step
+
+    // mutation for dispersal gene
+    if (bernoulli(dMutRate)) genes_dispersal += normal(dMutBias, dMutEffect);
     
-    // dispersal genes only mutate after no dispersal evolution phase has ended
-    if (year >= p.years_no_disp_evol+1) {
-        for (int i = 0; i<num_knots_disp; ++i) {
-            if (bernoulli(p.mut_rate)) genes_dispersal(i, 0) += normal(p.mut_bias, p.mut_effect);
-        }
-    }
+    // mutation for larval growth logistic coefficients
+    if (bernoulli(dMutBias)) genes_growth[0] += normal(dMutBias, dMutEffect);
+    if (bernoulli(dMutBias)) genes_growth[1] += normal(dMutBias, dMutEffect);
     
-    // manipulation genes only mutate after no manipulation phase has ended
-    if (year >= p.years_no_manip+1) {
-        for (int i = 0; i < num_knots_off; ++i) {
-            if (bernoulli(p.mut_rate)) genes_offspring_b1(i, 0) += normal(p.mut_bias, p.mut_effect);
-        }
-    }
-    
-    // sex allocation genes only mutate after no sex allocation evol phase has ended
-    if (year >= p.years_no_sa_evol+1) {
-       for (auto& g : genes_sex_allocations) {
-            if (bernoulli(p.mut_rate)) g += normal(p.mut_bias, p.mut_effect);
-        }
-    }
 }
 
 #endif /* Haplotype_hpp */
