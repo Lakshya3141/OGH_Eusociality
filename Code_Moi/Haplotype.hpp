@@ -10,6 +10,7 @@
 
 #include "Parameters.hpp"
 #include "Random.hpp"
+#include <array>
 //#include <Eigen/Dense>
 
 class Haplotype {
@@ -21,7 +22,7 @@ class Haplotype {
     double initialise_genes_dispersal();
     std::array<double, 2> initialise_genes_growth();
     void mutate();
-}
+};
 
 double Haplotype::initialise_genes_dispersal() {
     double temp_disp;
@@ -41,8 +42,8 @@ void Haplotype::mutate() {
     if (bernoulli(dMutRate)) genes_dispersal += normal(dMutBias, dMutEffect);
     
     // mutation for larval growth logistic coefficients
-    if (bernoulli(dMutBias)) genes_growth[0] += normal(dMutBias, dMutEffect);
-    if (bernoulli(dMutBias)) genes_growth[1] += normal(dMutBias, dMutEffect);
+    if (bernoulli(dMutBias)) genes_growth[0] += 0.02; //normal(dMutBias, dMutEffect);
+    if (bernoulli(dMutBias)) genes_growth[1] += 0.02; //normal(dMutBias, dMutEffect);
     
 }
 
