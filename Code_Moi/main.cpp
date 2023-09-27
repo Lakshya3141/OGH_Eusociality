@@ -8,7 +8,7 @@
 #include "Haplotype.hpp"
 #include <iostream>
 
-int main() {
+void haplo_check(){
     Haplotype hpl;
     std::cout << "Check print 1\n";
     std::cout << "g\ta\tb\n";
@@ -29,5 +29,16 @@ int main() {
     
     }
     std::cout << "\nCheck print 2.2\n";
+}
+
+int main() {
+    //haplo_check();
+    std::array<double, 2> a {2, 3}, b {4, 5};
+    double c[5];
+    for (int i = 0; i < 5; i++) {  
+        c[i] = a[i] + b[i];  
+        std::cout << c[i] << " "; 
+    }  
+
     return 0;
 }
