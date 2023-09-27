@@ -7,6 +7,25 @@
 //
 #include "Haplotype.hpp"
 #include <iostream>
+#include "Random.hpp"
+
+void haplo_check();
+void individual_check();
+template<typename T, std::size_t N>
+std::array<T, N> array_sum(const std::array<T, N>& a, const std::array<T, N>& b);
+
+
+int main() {
+    std::array<double, 2> a {10, 11}, b {4, 5};
+    std::array<double, 2> c;
+    c = array_sum(a, b);
+    for (int i = 0; i < 2; i++) {  
+        std::cout << c[i] << " "; 
+    }
+    return 0;
+}
+
+void individual_check(){}
 
 void haplo_check(){
     Haplotype hpl;
@@ -31,14 +50,14 @@ void haplo_check(){
     std::cout << "\nCheck print 2.2\n";
 }
 
-int main() {
-    //haplo_check();
-    std::array<double, 2> a {2, 3}, b {4, 5};
-    double c[5];
-    for (int i = 0; i < 5; i++) {  
-        c[i] = a[i] + b[i];  
-        std::cout << c[i] << " "; 
-    }  
-
-    return 0;
+template<typename T, std::size_t N>
+std::array<T, N> array_sum(const std::array<T, N>& a, const std::array<T, N>& b){
+    std::array<T, N> sum;
+    for (std::size_t i = 0; i < N; ++i) {
+        sum[i] = a[i] + b[i];
+    }
+    return sum;
 }
+
+
+//end

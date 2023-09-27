@@ -10,6 +10,7 @@
 
 #include <random>
 #include <chrono>
+#include <array>
 
 unsigned int simulationID = static_cast<unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count()); // sample a seed
 std::mt19937 rn(simulationID); // seed the random number generator
@@ -30,4 +31,11 @@ double uni_real(double lower = 0.0, double upper = 1.0) { return std::uniform_re
 // binomial distribution
 int binom(int n, double p) { return std::binomial_distribution<int>(n,p)(rn); }
 
+// defining array + operator
+// template<typename T, unsigned long N>
+// std::array<T, N> operator+(const std::array<T, N>& a, const std::array<T, N>& b) {
+//     std::array<T, N> sum = a;
+//     sum += b;
+//     return sum;
+// }
 #endif /* Random_hpp */

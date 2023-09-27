@@ -37,10 +37,8 @@ std::array<double, 2> Haplotype::initialise_genes_growth() {
 
 void Haplotype::mutate() {
     // For now, the mutation bias is 1 and hence mutation occurs at every step
-
     // mutation for dispersal gene
     if (bernoulli(dMutRate)) genes_dispersal += normal(dMutBias, dMutEffect);
-    
     // mutation for larval growth logistic coefficients
     if (bernoulli(dMutRate)) genes_growth[0] += normal(dMutBias, dMutEffect);
     if (bernoulli(dMutRate)) genes_growth[1] += normal(dMutBias, dMutEffect);

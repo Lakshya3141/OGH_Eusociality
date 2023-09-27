@@ -35,13 +35,12 @@ public:
     std::array<double, 2> phenotype_growth;
     
     bool is_alive = true;
-    void survival(const double prob);
-    bool check_dispersal(const Eigen::MatrixXd& basis_matrix);
+    void survival(const double surv_prob);
+    void forage(const double limit);
     bool disperser = false;
     bool helper = false;
-    void range_bodysize();
     
-    double body_size;
+    double body_size;      // for now, body size reflected by foraging
     int num_offspring;     // number of offspring a foundress will produce
     int num_fem_offspring; // number of female offspring a foundress will produce
     
@@ -65,8 +64,9 @@ Individual<2>::Individual (const diploid_genome& genome_mum, const haploid_genom
     genome[0].genes_growth = genome_dad[0].genes_growth;
     
     // daughter inherits one haplotype from mum at random
-    genome[1].genes_dispersal = genome_mum[bernoulli()].genes_dispersal;
-    genome[1].genes_growth = genome_mum[bernoulli()].genes_growth;
+    bool chosen_hpl = bernoulli(); 
+    genome[1].genes_dispersal = genome_mum[chosen_hpl].genes_dispersal;
+    genome[1].genes_growth = genome_mum[chosen_hpl].genes_growth;
     mutate();
     calculate_phenotype();
 }
@@ -83,6 +83,30 @@ void Individual<Ploidy>::mutate() {
     for (int i=0; i<Ploidy; ++i) {
         genome[i].mutate();
     }
+}
+
+// determine female phenotype from taking average of the haplotypes
+template<>
+void Individual<2>::calculate_phenotype() {
+    
+    phenotype_dispersal = (genome[0].genes_dispersal + genome[1].genes_dispersal) / 2;
+    phenotype_growth[0] = (genome[0].genes_growth[0] + genome[1].genes_growth[0]) / 2;
+    phenotype_growth[1] = (genome[0].genes_growth[1] + genome[1].genes_growth[1]) / 2;
+}
+
+// survival check
+template <int Ploidy>
+void Individual<Ploidy>::survival(const double surv_prob){
+    if bernoulli(surv_prob) is_alive = true;
+    else is_alive = false;
+    if(body_size <= 0.0) is_alive = false;
+}
+
+// foraging function
+template <int Ploidy>
+void Individual<Ploidy>::forage(const double limit = 1.0){
+    food = uni_real(0.0, limit); //trial for now, doesn't matter
+    body_size += food*0.1;
 }
 
 #endif /* Individual_hpp */
