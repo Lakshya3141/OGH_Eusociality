@@ -17,4 +17,6 @@ double dMutRate = 1.0; //Mutation probability
 double dMutBias = 0.0; //Mutation Bias
 double dMutEffect = 0.02; //Mutation effect
 
+// add survival probability and limit to foraging
+
 #endif /* Parameters_hpp */

@@ -23,11 +23,14 @@ public:
     Individual() = default;
     Individual(const diploid_genome& genome_mum); // male
     Individual(const diploid_genome& genome_mum, const haploid_genome& genome_dad); // female
-    
+
+    Haplotype sperm;
     std::array<Haplotype, Ploidy> genome; // genome of individual with 1 or 2 haplotypes
-    sperm_genomes sperm; // sperm vector to allow for multiple matings
-    
-    void mate(const sperm_genomes& sg);
+     // sperm vector to allow for multiple matings
+    // Revisit this in case we might not need multiple matings, for now keep it simple
+    // and carry only 1 haploid genome and not a vector
+    // sperm_genomes sperm;
+    void mate(const Haplotype& sg); // revisit this too
     void mutate();
     void calculate_phenotype();
     
@@ -73,7 +76,7 @@ Individual<2>::Individual (const diploid_genome& genome_mum, const haploid_genom
 
 // mate function
 template <>
-void Individual<2>::mate(const sperm_genomes& sg) {
+void Individual<2>::mate(const Haplotype& sg) {
     sperm = sg; // females store sperm from mate
 }
 
@@ -88,10 +91,9 @@ void Individual<Ploidy>::mutate() {
 // determine female phenotype from taking average of the haplotypes
 template<>
 void Individual<2>::calculate_phenotype() {
-    
-    phenotype_dispersal = (genome[0].genes_dispersal + genome[1].genes_dispersal) / 2;
-    phenotype_growth[0] = (genome[0].genes_growth[0] + genome[1].genes_growth[0]) / 2;
-    phenotype_growth[1] = (genome[0].genes_growth[1] + genome[1].genes_growth[1]) / 2;
+    phenotype_dispersal = (genome[0].genes_dispersal + genome[1].genes_dispersal) * 0.5;
+    phenotype_growth[0] = (genome[0].genes_growth[0] + genome[1].genes_growth[0]) * 0.5;
+    phenotype_growth[1] = (genome[0].genes_growth[1] + genome[1].genes_growth[1]) * 0.5;
 }
 
 // survival check

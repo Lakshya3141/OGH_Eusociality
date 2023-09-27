@@ -13,9 +13,12 @@
 #include <array>
 //#include <Eigen/Dense>
 
+// Change name of genes_growth
+// initialiser lists are compUTtionally efficient compared to declaring body
 class Haplotype {
     public:
     Haplotype() : genes_dispersal{initialise_genes_dispersal()}, genes_growth{initialise_genes_growth()} {}
+    // Haplotype() : genes_dispersal{dInitDispersal}, genes_growth{initialise_genes_growth()} {}
     double genes_dispersal;
     std::array<double, 2> genes_growth;
     
@@ -24,6 +27,7 @@ class Haplotype {
     void mutate();
 };
 
+// remove function if need be
 double Haplotype::initialise_genes_dispersal() {
     double temp_disp;
     temp_disp = dInitDispersal;
@@ -36,13 +40,14 @@ std::array<double, 2> Haplotype::initialise_genes_growth() {
 }
 
 void Haplotype::mutate() {
-    // For now, the mutation bias is 1 and hence mutation occurs at every step
+    // For now, the mutation rate is 1 and hence mutation occurs at every step
     // mutation for dispersal gene
     if (bernoulli(dMutRate)) genes_dispersal += normal(dMutBias, dMutEffect);
     // mutation for larval growth logistic coefficients
-    if (bernoulli(dMutRate)) genes_growth[0] += normal(dMutBias, dMutEffect);
-    if (bernoulli(dMutRate)) genes_growth[1] += normal(dMutBias, dMutEffect);
-
+    // write a for loop to make it elegab
+    for(int i = 0; i < 2; ++i){
+        if (bernoulli(dMutRate)) genes_growth[i] += normal(dMutBias, dMutEffect);
+    }
 }
 
 #endif /* Haplotype_hpp */

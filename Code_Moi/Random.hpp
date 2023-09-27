@@ -31,7 +31,7 @@ double uni_real(double lower = 0.0, double upper = 1.0) { return std::uniform_re
 // binomial distribution
 int binom(int n, double p) { return std::binomial_distribution<int>(n,p)(rn); }
 
-// defining array + operator
+//defining array + operator
 // template<typename T, unsigned long N>
 // std::array<T, N> operator+(const std::array<T, N>& a, const std::array<T, N>& b) {
 //     std::array<T, N> sum = a;
