@@ -1,15 +1,15 @@
 //
-//  Individual.hpp
+//  Nest.hpp
 //  OGH_Eusociality
 //
-//  Created by Lakshya Chauhan on 25/09/2023.
+//  Created by Lakshya Chauhan on 28/09/2023.
 //  Copyright © 2023 Lakshya Chauhan. All rights reserved.
 //  Large code snippets borrowed from Ella Rees-Baylis
 
-#ifndef Individual_hpp
-#define Individual_hpp
+#ifndef Nest_hpp
+#define Nest_hpp
 
-#include "Haplotype.hpp"
+#include "Individual.hpp"
 #include "Random.hpp"
 
 using diploid_genome = std::array<Haplotype, 2>;
@@ -49,66 +49,5 @@ public:
     
 };
 
-// constructor for males (haploid)
-template <>
-Individual<1>::Individual (const diploid_genome& genome_mum) {
-    // son inherits genes from mum (with 50:50 chance of each haplotype)
-    genome[0].genes_dispersal = genome_mum[bernoulli()].genes_dispersal;
-    genome[0].genes_growth = genome_mum[bernoulli()].genes_growth;
-    mutate(); // individual is created then mutates
-}
 
-// constructor for females (diploid)
-template <>
-Individual<2>::Individual (const diploid_genome& genome_mum, const haploid_genome& genome_dad) {
-
-    // daughter inherits one haplotype from dad
-    genome[0].genes_dispersal = genome_dad[0].genes_dispersal;
-    genome[0].genes_growth = genome_dad[0].genes_growth;
-    
-    // daughter inherits one haplotype from mum at random
-    bool chosen_hpl = bernoulli(); 
-    genome[1].genes_dispersal = genome_mum[chosen_hpl].genes_dispersal;
-    genome[1].genes_growth = genome_mum[chosen_hpl].genes_growth;
-    mutate();
-    calculate_phenotype();
-}
-
-// mate function
-template <>
-void Individual<2>::mate(const Haplotype& sg) {
-    sperm = sg; // females store sperm from mate
-}
-
-// mutate function
-template <int Ploidy>
-void Individual<Ploidy>::mutate() {
-    for (int i=0; i<Ploidy; ++i) {
-        genome[i].mutate();
-    }
-}
-
-// determine female phenotype from taking average of the haplotypes
-template<>
-void Individual<2>::calculate_phenotype() {
-    phenotype_dispersal = (genome[0].genes_dispersal + genome[1].genes_dispersal) * 0.5;
-    phenotype_growth[0] = (genome[0].genes_growth[0] + genome[1].genes_growth[0]) * 0.5;
-    phenotype_growth[1] = (genome[0].genes_growth[1] + genome[1].genes_growth[1]) * 0.5;
-}
-
-// survival check
-template <int Ploidy>
-void Individual<Ploidy>::survival(const double surv_prob){
-    if bernoulli(surv_prob) is_alive = true;
-    else is_alive = false;
-    if(body_size <= 0.0) is_alive = false;
-}
-
-// foraging function
-template <int Ploidy>
-void Individual<Ploidy>::forage(const double limit = 1.0){
-    food = uni_real(0.0, limit); //trial for now, doesn't matter
-    body_size += food*0.1;
-}
-
-#endif /* Individual_hpp */
+#endif /* Nest_hpp */

@@ -13,17 +13,17 @@
 #include <array>
 //#include <Eigen/Dense>
 
-// Change name of genes_growth
-// initialiser lists are compUTtionally efficient compared to declaring body
+// Change name of genes_choice
+// initialiser lists are computtionally efficient compared to declaring body
 class Haplotype {
     public:
-    Haplotype() : genes_dispersal{initialise_genes_dispersal()}, genes_growth{initialise_genes_growth()} {}
-    // Haplotype() : genes_dispersal{dInitDispersal}, genes_growth{initialise_genes_growth()} {}
+    Haplotype() : genes_dispersal{initialise_genes_dispersal()}, genes_choice{initialise_genes_choice()} {}
+    // Haplotype() : genes_dispersal{dInitDispersal}, genes_choice{initialise_genes_choice()} {}
     double genes_dispersal;
-    std::array<double, 2> genes_growth;
+    std::array<double, 2> genes_choice;
     
     double initialise_genes_dispersal();
-    std::array<double, 2> initialise_genes_growth();
+    std::array<double, 2> initialise_genes_choice();
     void mutate();
 };
 
@@ -34,8 +34,8 @@ double Haplotype::initialise_genes_dispersal() {
     return temp_disp;
 }
 
-std::array<double, 2> Haplotype::initialise_genes_growth() {
-    std::array<double, 2> temp_genes = {dInitGrowthIntercept, dInitGrowthSlope};
+std::array<double, 2> Haplotype::initialise_genes_choice() {
+    std::array<double, 2> temp_genes = {dInitChoiceIntercept, dInitChoiceSlope};
     return temp_genes;
 }
 
@@ -46,7 +46,7 @@ void Haplotype::mutate() {
     // mutation for larval growth logistic coefficients
     // write a for loop to make it elegab
     for(int i = 0; i < 2; ++i){
-        if (bernoulli(dMutRate)) genes_growth[i] += normal(dMutBias, dMutEffect);
+        if (bernoulli(dMutRate)) genes_choice[i] += normal(dMutBias, dMutEffect);
     }
 }
 

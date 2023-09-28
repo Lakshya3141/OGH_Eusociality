@@ -5,27 +5,26 @@
 //  Created by Lakshya Chauhan on 25/09/2023.
 //  Copyright © 2023 Lakshya Chauhan. All rights reserved.
 //
-#include "Haplotype.hpp"
+#include "individual.hpp"
 #include <iostream>
 #include "Random.hpp"
 
 void haplo_check();
-void individual_check();
+
 template<typename T, std::size_t N>
 std::array<T, N> array_sum(const std::array<T, N>& a, const std::array<T, N>& b);
 
+template<int Ploidy>
+void print_individual(const Individual<Ploidy>& tmp);
 
 int main() {
-    std::array<double, 2> a {10, 11}, b {4, 5};
-    std::array<double, 2> c;
-    c = array_sum(a, b);
-    for (int i = 0; i < 2; i++) {  
-        std::cout << c[i] << " "; 
-    }
+    Individual<2> mom;
+    Individual<1> dad;
+    Individual tmp = dad;
+    print_individual(tmp);
     return 0;
 }
 
-void individual_check(){}
 
 void haplo_check(){
     Haplotype hpl;
@@ -33,15 +32,15 @@ void haplo_check(){
     std::cout << "g\ta\tb\n";
     std::cout << hpl.genes_dispersal << "\t";
     
-    // Print the elements of the genes_growth array individually
-    for (const double& gene : hpl.genes_growth) {
+    // Print the elements of the genes_choice array individually
+    for (const double& gene : hpl.genes_choice) {
         std::cout << gene << "\t";
     }
     std::cout << "\n";
     for (int i = 0; i < 50; ++i){
         hpl.mutate();
         std::cout << hpl.genes_dispersal << "\t";
-        for (const double& gene : hpl.genes_growth) {
+        for (const double& gene : hpl.genes_choice) {
             std::cout << gene << "\t";
     }
     std::cout << "\n";
@@ -59,5 +58,12 @@ std::array<T, N> array_sum(const std::array<T, N>& a, const std::array<T, N>& b)
     return sum;
 }
 
+template<int Ploidy>
+void print_individual(const Individual<Ploidy>& tmp){
+    std::cout << tmp.body_size << tmp.disperser << tmp.is_alive << tmp.is_larvae << "\n";
+    for (int i = 0; i < tmp.genome.size() ; ++i){
+        std::cout << tmp.genome[i].genes_dispersal << tmp.genome[i].genes_choice[0] << tmp.genome[i].genes_choice[1] << "\n";
+    }
+}
 
 //end
