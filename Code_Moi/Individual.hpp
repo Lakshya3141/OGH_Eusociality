@@ -37,14 +37,14 @@ public:
     void calculate_phenotype();
     
     double phenotype_dispersal;
-    std::array<double, 2> phenotype_growth;
+    std::array<double, 2> phenotype_choice;
     
     void survival(const double& survival_prob = dSurvProb);
     void forage(const double& mean = dForagingMean, const double& SD = dForagingSD);
     void feed(const double& food);
     void check_mature();
     bool disperser = false;
-    bool helper = false;
+    bool foraging = false;      // If not foraging, then brooding
     
     double body_size = 0.0;     // body size, primarily used for larvae
     double resources = 0.0;     // resources brought back in one foraging trip
@@ -54,13 +54,28 @@ public:
     unsigned int nest_id;       // Nest identifier
 };
 
-// calculate phenotype
+// calculate phenotype // works
 template<>
 void Individual<2>::calculate_phenotype() {
     phenotype_dispersal = (genome[0].genes_dispersal + genome[1].genes_dispersal) * 0.5;
-    phenotype_growth[0] = (genome[0].genes_choice[0] + genome[1].genes_choice[0]) * 0.5;
-    phenotype_growth[1] = (genome[0].genes_choice[1] + genome[1].genes_choice[1]) * 0.5;
+    phenotype_choice[0] = (genome[0].genes_choice[0] + genome[1].genes_choice[0]) * 0.5;
+    phenotype_choice[1] = (genome[0].genes_choice[1] + genome[1].genes_choice[1]) * 0.5;
 }
+
+// constructor for default
+// template <int Ploidy>
+// Individual<Ploidy>::Individual() {
+
+//     for (int i = 0; i < Ploidy; ++i) {
+//         Haplotype hpl;
+//         this->genome[i] = hpl;
+//     }
+//     // Call the mutate function
+//     mutate();
+//     // Call the calculate_phenotype function
+//     calculate_phenotype();
+
+// }
 
 // constructor for males (haploid)
 template <>
@@ -80,20 +95,20 @@ Individual<2>::Individual (const diploid_genome& genome_mum, const haploid_genom
     genome[0].genes_dispersal = genome_dad[0].genes_dispersal;
     genome[0].genes_choice = genome_dad[0].genes_choice;
     
-    genome[1].genes_dispersal = genome_mum[bernoulli()].genes_dispersal;
-    genome[1].genes_choice = genome_mum[bernoulli()].genes_choice;
+    genome[1].genes_dispersal = genome_mum[0].genes_dispersal;
+    genome[1].genes_choice = genome_mum[0].genes_choice;
     is_larvae = true;
-    mutate();
+    // mutate();
     calculate_phenotype();
 }
 
-// mate function
+// mate function // works
 template <>
 void Individual<2>::mate(const Haplotype& sg) {
     sperm = sg; // females store sperm from mate
 }
 
-// mutate function
+// mutate function // works
 template <int Ploidy>
 void Individual<Ploidy>::mutate() {
     for (int i=0; i<Ploidy; ++i) {
@@ -101,7 +116,7 @@ void Individual<Ploidy>::mutate() {
     }
 }
 
-// survival check
+// survival check // works
 // MIGHT NEED TO REVISIT WHEN YOU TALK ABOUT WEATHER THIS APPLIES TO LARVAE OR NOT
 template <int Ploidy>
 void Individual<Ploidy>::survival(const double& survival_prob){
@@ -111,19 +126,19 @@ void Individual<Ploidy>::survival(const double& survival_prob){
     // if(body_size <= 0.0) is_alive = false; // assuming they stay alive
 }
 
-// foraging function
+// foraging function // works
 template <int Ploidy>
 void Individual<Ploidy>::forage(const double& mean, const double& SD){
     resources += normal(mean, SD); //trial for now, doesn't matter
 }
 
-// feeding function
+// feeding function //works
 template <int Ploidy>
 void Individual<Ploidy>::feed(const double& food){
     body_size += food; // since food can be different from resources, needed 2 parameters
 }
 
-// function to check larval maturity
+// function to check larval maturity // works
 template <int Ploidy>
 void Individual<Ploidy>::check_mature(){
     if (body_size >= dMaturingSize) {

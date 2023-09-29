@@ -12,10 +12,6 @@
 #include "Individual.hpp"
 #include "Random.hpp"
 
-using diploid_genome = std::array<Haplotype, 2>;
-using haploid_genome = std::array<Haplotype, 1>;
-using sperm_genomes = std::vector<haploid_genome>;
-
 template <int Ploidy>
 class Individual {
 public:

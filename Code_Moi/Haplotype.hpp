@@ -11,14 +11,16 @@
 #include "Parameters.hpp"
 #include "Random.hpp"
 #include <array>
+#include <string>
 //#include <Eigen/Dense>
 
 // Change name of genes_choice
 // initialiser lists are computtionally efficient compared to declaring body
 class Haplotype {
     public:
+    // Haplotype(char s) {}
     Haplotype() : genes_dispersal{initialise_genes_dispersal()}, genes_choice{initialise_genes_choice()} {}
-    // Haplotype() : genes_dispersal{dInitDispersal}, genes_choice{initialise_genes_choice()} {}
+
     double genes_dispersal;
     std::array<double, 2> genes_choice;
     
