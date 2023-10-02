@@ -21,8 +21,8 @@ template <int Ploidy>
 class Individual {
 public:
     bool is_alive = true;                           //
-    bool is_larvae = false;                          // needs to be before constructor definition
-
+    bool is_larvae = false;                         // needs to be before constructor definition
+    bool is_fed = false;
     // Individual constructors
     Individual() = default;
     Individual(const diploid_genome& genome_mum);   // male
@@ -42,7 +42,7 @@ public:
     void survival(const double& survival_prob = dSurvProb);
     void forage(const double& mean = dForagingMean, const double& SD = dForagingSD);
     void feed(const double& food);
-    void check_mature();
+    bool check_mature();
     bool task_check();      // function to check and change task choice
     bool disperser = false;
     bool is_foraging = false;      // If not foraging, then brooding
@@ -62,21 +62,6 @@ void Individual<2>::calculate_phenotype() {
     phenotype_choice[0] = (genome[0].genes_choice[0] + genome[1].genes_choice[0]) * 0.5;
     phenotype_choice[1] = (genome[0].genes_choice[1] + genome[1].genes_choice[1]) * 0.5;
 }
-
-// constructor for default
-// template <int Ploidy>
-// Individual<Ploidy>::Individual() {
-
-//     for (int i = 0; i < Ploidy; ++i) {
-//         Haplotype hpl;
-//         this->genome[i] = hpl;
-//     }
-//     // Call the mutate function
-//     mutate();
-//     // Call the calculate_phenotype function
-//     calculate_phenotype();
-
-// }
 
 // constructor for males (haploid)
 template <>
@@ -140,6 +125,7 @@ void Individual<Ploidy>::forage(const double& mean, const double& SD){
 template <int Ploidy>
 void Individual<Ploidy>::feed(const double& food){
     body_size += food; // since food can be different from resources, needed 2 parameters
+    is_fed = true;
 }
 
 // task check function // works
@@ -154,10 +140,11 @@ bool Individual<2>::task_check() {
 // function to check larval maturity // works
 // chooses task the moment born
 template <int Ploidy>
-void Individual<Ploidy>::check_mature(){
+bool Individual<Ploidy>::check_mature(){
     if (body_size >= dMaturingSize) {
         is_larvae = false;
         task_check();
+        return true;
     }
 }
 
