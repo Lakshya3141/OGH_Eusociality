@@ -18,14 +18,11 @@ public:
     //  vector for larvae as well
 
     // temp vector to hold male adults and then move them to population level, delete the one at nest level
-
     // feed function loops through female, choose random larvae to give food to
     std::vector<Individual<2> > adult_females;          // vector of adult females, [0] = breeder
     std::vector<Individual<1> > tmp_males;              // temporary vector for adult males
     std::vector<Individual<2> > larval_females;         // vector to store larval females
     std::vector<Individual<1> > larval_males;           // vector to store larval males
-    std::vector<Individual<2> > dum_females;            // vector to store larval females DUMMY
-    std::vector<Individual<1> > dum_males;              // vector to store larval males DUMMY
 
     int num_breeders;
 private:
@@ -68,7 +65,8 @@ bool Nest::feedRandomLarva(std::vector<Individual<Ploidy> >& larvae, Individual<
 
 int Nest::feed() {
     int numFed = 0;
-
+    std::vector<Individual<2> > dum_females;            // vector to store larval females DUMMY
+    std::vector<Individual<1> > dum_males;              // vector to store larval males DUMMY
     for (Individual<2>& female : adult_females) {
         if (female.is_foraging) {
             // Decide whether to feed male or female larvae
@@ -109,8 +107,6 @@ int Nest::feed() {
     // concatenate dum and larval vectors
     larval_males.insert(larval_males.end(), dum_males.begin(), dum_males.end());
     larval_females.insert(larval_females.end(), dum_females.begin(), dum_females.end());
-
-    
 
     return numFed;
 }
