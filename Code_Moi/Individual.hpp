@@ -43,8 +43,9 @@ public:
     void forage(const double& mean = dForagingMean, const double& SD = dForagingSD);
     void feed(const double& food);
     void check_mature();
+    bool task_check();      // function to check and change task choice
     bool disperser = false;
-    bool foraging = false;      // If not foraging, then brooding
+    bool is_foraging = false;      // If not foraging, then brooding
     
     double body_size = 0.0;     // body size, primarily used for larvae
     double resources = 0.0;     // resources brought back in one foraging trip
@@ -92,13 +93,16 @@ template <>
 Individual<2>::Individual (const diploid_genome& genome_mum, const haploid_genome& genome_dad) {
 
     // daughter inherits one haplotype from dad
-    genome[0].genes_dispersal = genome_dad[0].genes_dispersal;
-    genome[0].genes_choice = genome_dad[0].genes_choice;
+    genome[0] = genome_dad[0];
+    //genome[0].genes_dispersal = genome_dad[0].genes_dispersal;
+    //genome[0].genes_choice = genome_dad[0].genes_choice;
     
-    genome[1].genes_dispersal = genome_mum[0].genes_dispersal;
-    genome[1].genes_choice = genome_mum[0].genes_choice;
+    genome[1].genes_dispersal = genome_mum[bernoulli()].genes_dispersal;
+    genome[1].genes_choice[0] = genome_mum[bernoulli()].genes_choice[0];
+    genome[1].genes_choice[1] = genome_mum[bernoulli()].genes_choice[1];
+
     is_larvae = true;
-    // mutate();
+    mutate();
     calculate_phenotype();
 }
 
@@ -117,7 +121,7 @@ void Individual<Ploidy>::mutate() {
 }
 
 // survival check // works
-// MIGHT NEED TO REVISIT WHEN YOU TALK ABOUT WEATHER THIS APPLIES TO LARVAE OR NOT
+// MIGHT NEED TO REVISIT WHEN YOU TALK ABOUT WETHER THIS APPLIES TO LARVAE OR NOT
 template <int Ploidy>
 void Individual<Ploidy>::survival(const double& survival_prob){
     //if (!is_larvae && !bernoulli(survival_prob)) {is_alive = false;}
@@ -138,11 +142,22 @@ void Individual<Ploidy>::feed(const double& food){
     body_size += food; // since food can be different from resources, needed 2 parameters
 }
 
+// task check function // works
+template <>
+bool Individual<2>::task_check() {
+    bool tmp1 = bernoulli(logistic(num_offspring, phenotype_choice[0], phenotype_choice[1]));
+    bool tmp2 = is_foraging;
+    is_foraging = tmp1;
+    return tmp2 ^ is_foraging;      // returns true if a switch happened
+}
+
 // function to check larval maturity // works
+// chooses task the moment born
 template <int Ploidy>
 void Individual<Ploidy>::check_mature(){
     if (body_size >= dMaturingSize) {
         is_larvae = false;
+        task_check();
     }
 }
 

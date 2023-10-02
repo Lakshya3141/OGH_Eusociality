@@ -20,6 +20,15 @@ void print_individual(const Individual<Ploidy>& tmp);
 
 int main() {
     indi_check();
+    for(int j = 0; j<5; ++j){
+        int cnt = 0;
+        for(int i = 0; i < 1000; ++i) {
+            bool tmp = bernoulli(logistic(j, 0.0, 0.0));
+            if (tmp) cnt++;
+            //std::cout << tmp << "\n";
+        }
+        //std::cout << cnt << "\n";
+    }
     return 0;
 }
 
