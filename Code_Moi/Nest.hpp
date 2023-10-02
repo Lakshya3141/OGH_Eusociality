@@ -89,20 +89,26 @@ int Nest::feed() {
         }
     }
 
-    auto partitionIter = std::partition(dum_females.begin(), dum_females.end(), [](Individual<2> indi) {
+    // remove all the females from dum_females that have been fed and now matured
+    auto partitionIterF = std::partition(dum_females.begin(), dum_females.end(), [](Individual<2> indi) {
         return !indi.is_larvae; 
     });
-    adult_females.assign(partitionIter, dum_females.end());
-    dum_females.erase(partitionIter, dum_females.end());
 
-    auto partitionIter = std::partition(dum_males.begin(), dum_males.end(), [](Individual<1> indi) {
+    // add those to adult females
+    adult_females.assign(partitionIterF, dum_females.end());
+    // remove them from dum_females
+    dum_females.erase(partitionIterF, dum_females.end());
+
+    // Same process repeated for males
+    auto partitionIterM = std::partition(dum_males.begin(), dum_males.end(), [](Individual<1> indi) {
         return !indi.is_larvae;
     });
-    tmp_males.assign(partitionIter, tmp_males.end());
-    dum_males.erase(partitionIter, tmp_males.end());
+    tmp_males.assign(partitionIterM, tmp_males.end());
+    dum_males.erase(partitionIterM, tmp_males.end());
 
-    larval_males.insert(larval_females.end(), dum_males.begin(), dum_males.end());
+    // concatenate dum and larval vectors
     larval_males.insert(larval_males.end(), dum_males.begin(), dum_males.end());
+    larval_females.insert(larval_females.end(), dum_females.begin(), dum_females.end());
 
     
 
