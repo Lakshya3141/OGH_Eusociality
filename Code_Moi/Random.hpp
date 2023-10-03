@@ -31,6 +31,11 @@ double uni_real(double lower = 0.0, double upper = 1.0) { return std::uniform_re
 // binomial distribution
 int binom(int n, double p) { return std::binomial_distribution<int>(n,p)(rn); }
 
+template <typename T>
+double logistic(T x, double intercept = dLarvaIntercept, double slope = dLarvaSlope) {
+    return 1 / (1 + exp(intercept + static_cast<double>(x) * slope));
+}
+
 //defining array + operator
 // template<typename T, unsigned long N>
 // std::array<T, N> operator+(const std::array<T, N>& a, const std::array<T, N>& b) {
