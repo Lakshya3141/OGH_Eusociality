@@ -64,11 +64,11 @@ Individual<2>* Nest::feedRandomFemale(Individual<2>& female) {
     larval_females[selectedLarvaIndex].t_next = female.t_next;
     return &larval_females[selectedLarvaIndex];
 
-    // Check maturity of larvae
-    if (larval_females[selectedLarvaIndex].check_mature(female.t_next)) {
-        adult_females.push_back(larval_females[selectedLarvaIndex]);
-        larval_females.erase(larval_females.begin() + selectedLarvaIndex);
-    }
+    // // Check maturity of larvae
+    // if (larval_females[selectedLarvaIndex].check_mature(female.t_next)) {
+    //     adult_females.push_back(larval_females[selectedLarvaIndex]);
+    //     larval_females.erase(larval_females.begin() + selectedLarvaIndex);
+    // }
 }
 
 Individual<1>* Nest::feedRandomMale(Individual<2>& female) {
@@ -82,11 +82,11 @@ Individual<1>* Nest::feedRandomMale(Individual<2>& female) {
     larval_males[selectedLarvaIndex].t_next = female.t_next;
 
     return &larval_males[selectedLarvaIndex];
-    // Check maturity of larvae // shift to another function/
-    if (larval_males[selectedLarvaIndex].check_mature(female.t_next)) {
-        tmp_males.push_back(larval_males[selectedLarvaIndex]);
-        larval_males.erase(larval_males.begin() + selectedLarvaIndex);
-    }
+    // // Check maturity of larvae // shift to another function/
+    // if (larval_males[selectedLarvaIndex].check_mature(female.t_next)) {
+    //     tmp_males.push_back(larval_males[selectedLarvaIndex]);
+    //     larval_males.erase(larval_males.begin() + selectedLarvaIndex);
+    // }
 }
 
 bool Nest::reproduce(Individual<2>& female){
