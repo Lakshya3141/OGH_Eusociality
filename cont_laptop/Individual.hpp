@@ -15,22 +15,21 @@
 
 using diploid_genome = std::array<Haplotype, 2>;
 using haploid_genome = std::array<Haplotype, 1>;
-//using sperm_genomes = std::vector<haploid_genome>;
+using sperm_genomes = std::vector<haploid_genome>;
 
 template <int Ploidy>
 class Individual {
 public:
     bool is_alive = true;                           //
     bool is_larvae = false;                         // needs to be before constructor definition
-    bool is_fed = false;
     // Individual constructors
     Individual() = default;
-    Individual(const Individual<2>& mum);   // male
-    Individual(const Individual<2>& mum, const haploid_genome& genome_dad); // female
+    Individual(const Individual<2>& mum);   // male and female?
+    // Individual(const Individual<2>& mum);   // female
 
     Haplotype sperm;
     std::array<Haplotype, Ploidy> genome;           // genome of individual with 1 or 2 haplotypes
-    void mate(const Haplotype& sg); // revisit this too
+    void mate(const Individual<1>& male); // revisit this too
     void mutate();
     void calculate_phenotype();
 
@@ -48,7 +47,7 @@ public:
     void feed(const double& food);
     bool check_mature(double& birth_time);
     bool task_check();      // function to check and change task choice
-    bool disperser = false;
+    bool is_disperser = false;
     bool is_foraging = false;      // If not foraging, then brooding
     
     double body_size = 0.0;     // body size, primarily used for larvae
@@ -80,10 +79,10 @@ Individual<1>::Individual (const Individual<2>& mum) {
 
 // constructor for females (diploid)
 template <>
-Individual<2>::Individual (const Individual<2>& mum, const haploid_genome& genome_dad) {
+Individual<2>::Individual (const Individual<2>& mum) {
 
-    // daughter inherits one haplotype from dad
-    genome[0] = genome_dad[0];
+    // daughter inherits one haplotype from sperm stored with mum
+    genome[0] = mum.sperm;
     //genome[0].genes_dispersal = genome_dad[0].genes_dispersal;
     //genome[0].genes_choice = genome_dad[0].genes_choice;
     
@@ -95,12 +94,15 @@ Individual<2>::Individual (const Individual<2>& mum, const haploid_genome& genom
     is_larvae = true;
     mutate();
     calculate_phenotype();
+    if (bernoulli(logistic(phenotype_dispersal))){
+        is_disperser = true;
+    }
 }
 
 // mate function // works
 template <>
-void Individual<2>::mate(const Haplotype& sg) {
-    sperm = sg; // females store sperm from mate
+void Individual<2>::mate(const Individual<1>& male) {
+    sperm = male.genome[0]; // females store sperm from mate
 }
 
 // mutate function // works
@@ -131,7 +133,6 @@ void Individual<Ploidy>::forage(const double& mean, const double& SD){
 template <int Ploidy>
 void Individual<Ploidy>::feed(const double& food){
     body_size += food; // since food can be different from resources, needed 2 parameters
-    is_fed = true;
 }
 
 // task check function // works // revisited

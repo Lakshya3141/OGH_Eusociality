@@ -29,4 +29,7 @@ double dForagingMean = 1.0;         // Mean of normal foraging curve
 double dForagingSD = 0.3;           // SD of normal foraging curve
 double dMaturingSize = 1.0;         // Maturing size of larvae
 
+unsigned int max_nests = 1000;      // Maximum number of nests
+double const_sex_ratio = 0.1;       // male sex ratio
+
 #endif /* Parameters_hpp */

@@ -14,7 +14,12 @@
 class Nest {
 public:
     Nest(Individual<2>& f);
-    bool feed(Individual<2>& female);
+    template <int Ploidy>
+    Individual<Ploidy>* feed(Individual<2>& female);
+    bool reproduce(Individual<2>& female);
+    
+    Individual<1>* check_maturity(Individual<1>& male_larva);
+    Individual<2>* check_maturity(Individual<2>& female_larva);
 
     // temp vector to hold male adults and then move them to population level, delete the one at nest level
 
@@ -27,83 +32,74 @@ public:
 private:
     // template <int Ploidy>
     // bool feedRandomLarvae(std::vector<Individual<Ploidy> >& larvae, Individual<2>& female);
-    bool feedRandomFemale(Individual<2>& female);
-    bool feedRandomMale(Individual<2>& female);
+    Individual<2>* feedRandomFemale(Individual<2>& female);
+    Individual<1>* feedRandomMale(Individual<2>& female);
 };
 
-bool Nest::feed(Individual<2>& female){
+
+template <int Ploidy>
+Individual<Ploidy>* Nest::feed(Individual<2>& female){
     if (larval_males.size() + larval_females.size() != 0){
         // weighted probabilties
         double maleProbability = static_cast<double>(larval_males.size()) / (larval_males.size() + larval_females.size());
-        bool tmp = bernoulli(maleProbability);
+        
         // tmp ? feedRandomLarva(larval_males, female) : feedRandomLarva(larval_females, female);
-        tmp ? feedRandomMale(female) : feedRandomFemale(female);
+        if(bernoulli(maleProbability)) {
+            return feedRandomMale(female);
+        }
+        else return feedRandomFemale(female);
     }
+    return NULL;
 }
 
 Nest::Nest(Individual<2>& f) : adult_females{f} {} // initialiser list for nests (initialised with one female)
 
-bool Nest::feedRandomFemale(Individual<2>& female) {
+Individual<2>* Nest::feedRandomFemale(Individual<2>& female) {
 
     size_t selectedLarvaIndex = uni_int(0, larval_females.size() - 1);
-
+    female.t_next = female.t_next + dForagingTime;
     // Transfer resources from the female to the selected larva
     larval_females[selectedLarvaIndex].feed(female.resources);
     female.resources = 0.0;
+    larval_females[selectedLarvaIndex].t_next = female.t_next;
+    return &larval_females[selectedLarvaIndex];
 
     // Check maturity of larvae
     if (larval_females[selectedLarvaIndex].check_mature(female.t_next)) {
         adult_females.push_back(larval_females[selectedLarvaIndex]);
         larval_females.erase(larval_females.begin() + selectedLarvaIndex);
     }
-
-    return true;
 }
 
-bool Nest::feedRandomMale(Individual<2>& female) {
+Individual<1>* Nest::feedRandomMale(Individual<2>& female) {
 
     size_t selectedLarvaIndex = uni_int(0, larval_males.size() - 1);
 
+    female.t_next = female.t_next + dForagingTime;
     // Transfer resources from the female to the selected larva
     larval_males[selectedLarvaIndex].feed(female.resources);
     female.resources = 0.0;
+    larval_males[selectedLarvaIndex].t_next = female.t_next;
 
-    // Check maturity of larvae
+    return &larval_males[selectedLarvaIndex];
+    // Check maturity of larvae // shift to another function/
     if (larval_males[selectedLarvaIndex].check_mature(female.t_next)) {
         tmp_males.push_back(larval_males[selectedLarvaIndex]);
         larval_males.erase(larval_males.begin() + selectedLarvaIndex);
     }
-
-    return true;
 }
 
-// template <int Ploidy>
-// bool Nest::feedRandomLarva(std::vector<Individual<Ploidy> >& larvae, Individual<2>& female) {
-//     // if (larvae.empty()) {
-//     //     return false; // No larvae available to feed
-//     // } Removed cause unneccessary
+bool Nest::reproduce(Individual<2>& female){
+    if (bernoulli(const_sex_ratio)){
+        Individual<1> son(female);
+        larval_males.push_back(son);
+    }
+    else {
+        Individual<2> daughter(female);
+        larval_females.push_back(daughter);
+    }
+}
 
-//     // Randomly select a larva
-//     // std::uniform_int_distribution<size_t> dist(0, larvae.size() - 1);
-//     size_t selectedLarvaIndex = uni_int(0, larvae.size() - 1);
-
-//     // Transfer resources from the female to the selected larva
-//     larvae[selectedLarvaIndex].feed(female.resources);
-//     female.resources = 0;
-
-//     // Check maturity of larvae
-//     // Maybe we can declare two functions so there is no if checking here? Optimisation to be checked later
-//     (void)larvae[selectedLarvaIndex].check_mature();
-//     if (Ploidy == 2) {
-//         dum_females.push_back(larvae[selectedLarvaIndex]);
-//     }
-//     else if (Ploidy == 1) {
-//         dum_males.push_back(larvae[selectedLarvaIndex]);
-//     }
-//     larvae.erase(larvae.begin() + selectedLarvaIndex);
-
-//     return true;
-// }
 
 
 #endif /* Nest_hpp */
