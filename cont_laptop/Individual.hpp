@@ -15,7 +15,7 @@
 
 using diploid_genome = std::array<Haplotype, 2>;
 using haploid_genome = std::array<Haplotype, 1>;
-using sperm_genomes = std::vector<haploid_genome>;
+using sperm_genomes = std::vector<haploid_genome>; // YEP IS UNUSED YET
 
 template <int Ploidy>
 class Individual {
@@ -42,11 +42,13 @@ public:
     double phenotype_dispersal;
     std::array<double, 2> phenotype_choice;
     
-    void survival(const double& survival_prob = dSurvProb);
+    bool survival(const double& survival_prob = dSurvProb);
     void forage(const double& mean = dForagingMean, const double& SD = dForagingSD);
     void feed(const double& food);
     bool check_mature(double& birth_time);
     bool task_check();      // function to check and change task choice
+    bool check_disperser();
+
     bool is_disperser = false;
     bool is_foraging = false;      // If not foraging, then brooding
     
@@ -55,7 +57,7 @@ public:
     int num_offspring = 0;      // number of offspring a foundress will produce
     int num_fem_offspring = 0;  // number of female offspring a foundress will produce
     int num_larva = 0;
-    int num_femle_larva = 0;
+    int num_female_larva = 0;
     
 };
 
@@ -63,8 +65,9 @@ public:
 template<>
 void Individual<2>::calculate_phenotype() {
     phenotype_dispersal = (genome[0].genes_dispersal + genome[1].genes_dispersal) * 0.5;
-    phenotype_choice[0] = (genome[0].genes_choice[0] + genome[1].genes_choice[0]) * 0.5;
-    phenotype_choice[1] = (genome[0].genes_choice[1] + genome[1].genes_choice[1]) * 0.5;
+    for(int i = 0; i < 2; ++i) {
+        phenotype_choice[i] = (genome[0].genes_choice[i] + genome[1].genes_choice[i]) * 0.5;
+    }
 }
 
 // constructor for males (haploid)
@@ -87,16 +90,17 @@ Individual<2>::Individual (const Individual<2>& mum) {
     //genome[0].genes_choice = genome_dad[0].genes_choice;
     
     genome[1].genes_dispersal = mum.genome[bernoulli()].genes_dispersal;
-    genome[1].genes_choice[0] = mum.genome[bernoulli()].genes_choice[0];
-    genome[1].genes_choice[1] = mum.genome[bernoulli()].genes_choice[1];
+    for(int i = 0; i < 2; ++i) {
+        genome[1].genes_choice[i] = mum.genome[bernoulli()].genes_choice[i];
+    }
 
     nest_id = mum.nest_id;
     is_larvae = true;
     mutate();
     calculate_phenotype();
-    if (bernoulli(logistic(phenotype_dispersal))){
-        is_disperser = true;
-    }
+    // if (bernoulli(phenotype_dispersal)){
+    //     is_disperser = true;
+    // }
 }
 
 // mate function // works
@@ -116,16 +120,18 @@ void Individual<Ploidy>::mutate() {
 // survival check // works
 // MIGHT NEED TO REVISIT WHEN YOU TALK ABOUT WETHER THIS APPLIES TO LARVAE OR NOT
 template <int Ploidy>
-void Individual<Ploidy>::survival(const double& survival_prob){
+bool Individual<Ploidy>::survival(const double& survival_prob){
     //if (!is_larvae && !bernoulli(survival_prob)) {is_alive = false;}
-    if (!bernoulli(survival_prob)) {is_alive = false;}
-
+    if (!bernoulli(survival_prob)) {
+        is_alive = false;
+        return false;
+    }
+    else return true;
     // if(body_size <= 0.0) is_alive = false; // assuming they stay alive
 }
 
 // foraging function // works
-template <int Ploidy>
-void Individual<Ploidy>::forage(const double& mean, const double& SD){
+void Individual<2>::forage(const double& mean, const double& SD){
     resources += normal(mean, SD); //trial for now, doesn't matter
 }
 
@@ -158,7 +164,7 @@ bool Individual<2>::task_check() {
 // }
 
 bool Individual<1>::check_mature(double& birth_time){
-    if (body_size >= dMaturingSize) {
+    if (bernoulli(logistic(body_size, dLarvaIntercept, dLarvaSlope))) {
         is_larvae = false;
         t_birth = birth_time;
         return true;
@@ -166,14 +172,20 @@ bool Individual<1>::check_mature(double& birth_time){
 }
 
 bool Individual<2>::check_mature(double& birth_time){
-    if (body_size >= dMaturingSize) {
+    if (bernoulli(logistic(body_size, dLarvaIntercept, dLarvaSlope))) {
         is_larvae = false;
         task_check();
         t_birth = birth_time;
         return true;
     }
+    else return false;
 }
 
-
+bool Individual<2>::check_disperser(){
+    if (bernoulli(phenotype_dispersal)) {
+        return true;
+    }
+    else return false;
+}
 
 #endif /* Individual_hpp */

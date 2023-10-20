@@ -32,7 +32,7 @@ double uni_real(double lower = 0.0, double upper = 1.0) { return std::uniform_re
 int binom(int n, double p) { return std::binomial_distribution<int>(n,p)(rn); }
 
 template <typename T>
-double logistic(T x, double intercept = dLarvaIntercept, double slope = dLarvaSlope) {
+double logistic(T x, double intercept, double slope) {
     return 1 / (1 + exp(intercept + static_cast<double>(x) * slope));
 }
 

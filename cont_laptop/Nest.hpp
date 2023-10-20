@@ -15,16 +15,15 @@ class Nest {
 public:
     Nest(Individual<2>& f);
     template <int Ploidy>
-    Individual<Ploidy>* feed(Individual<2>& female);
+    int feed(Individual<2>& female);
     bool reproduce(Individual<2>& female);
-    
-    Individual<1>* check_maturity(Individual<1>& male_larva);
-    Individual<2>* check_maturity(Individual<2>& female_larva);
+    int check_maturity(int& index, double c_time); //only for females
+    bool is_empty();
 
     // temp vector to hold male adults and then move them to population level, delete the one at nest level
 
     std::vector<Individual<2> > adult_females;          // vector of adult females, [0] = breeder
-    std::vector<Individual<1> > tmp_males;              // temporary vector for adult males
+    // std::vector<Individual<1> > tmp_males;              // temporary vector for adult males
     std::vector<Individual<2> > larval_females;         // vector to store larval females
     std::vector<Individual<1> > larval_males;           // vector to store larval males
 
@@ -32,13 +31,34 @@ public:
 private:
     // template <int Ploidy>
     // bool feedRandomLarvae(std::vector<Individual<Ploidy> >& larvae, Individual<2>& female);
-    Individual<2>* feedRandomFemale(Individual<2>& female);
-    Individual<1>* feedRandomMale(Individual<2>& female);
+    int feedRandomFemale(Individual<2>& female);
+    int feedRandomMale(Individual<2>& female);
 };
 
+// check maturity for female larva
+// returns -1 if no mature
+// returns 0 if no disperser
+// returns 1 if matures and disperses 
+int Nest::check_maturity(int& index, double c_time){
+    // Check maturity of larvae // shift to another function/
+    if(!larval_females[index].check_mature(c_time)){
+        return -1;
+    }
+    else if (larval_females[index].is_disperser){
+        return 1;
+    }
+    else {
+        adult_females.emplace_back(larval_females[index]);
+        larval_females.erase(larval_females.begin() + index);
+        return 0;
+    }
+}
 
+
+// returns integer. If 0, no larvae fed. If negative, |index| - 1 is position of female larva
+// If positive, |index| - 1 is position of male larva
 template <int Ploidy>
-Individual<Ploidy>* Nest::feed(Individual<2>& female){
+int Nest::feed(Individual<2>& female){
     if (larval_males.size() + larval_females.size() != 0){
         // weighted probabilties
         double maleProbability = static_cast<double>(larval_males.size()) / (larval_males.size() + larval_females.size());
@@ -49,20 +69,20 @@ Individual<Ploidy>* Nest::feed(Individual<2>& female){
         }
         else return feedRandomFemale(female);
     }
-    return NULL;
+    return 0;
 }
 
 Nest::Nest(Individual<2>& f) : adult_females{f} {} // initialiser list for nests (initialised with one female)
 
-Individual<2>* Nest::feedRandomFemale(Individual<2>& female) {
+int Nest::feedRandomFemale(Individual<2>& female) {
 
-    size_t selectedLarvaIndex = uni_int(0, larval_females.size() - 1);
-    female.t_next = female.t_next + dForagingTime;
+    size_t selectedLarvaIndex = uni_int(0, larval_females.size());
+    female.t_next += dForagingTime;
     // Transfer resources from the female to the selected larva
     larval_females[selectedLarvaIndex].feed(female.resources);
     female.resources = 0.0;
     larval_females[selectedLarvaIndex].t_next = female.t_next;
-    return &larval_females[selectedLarvaIndex];
+    return -selectedLarvaIndex - 1;
 
     // // Check maturity of larvae
     // if (larval_females[selectedLarvaIndex].check_mature(female.t_next)) {
@@ -71,35 +91,37 @@ Individual<2>* Nest::feedRandomFemale(Individual<2>& female) {
     // }
 }
 
-Individual<1>* Nest::feedRandomMale(Individual<2>& female) {
+int Nest::feedRandomMale(Individual<2>& female) {
 
-    size_t selectedLarvaIndex = uni_int(0, larval_males.size() - 1);
+    size_t selectedLarvaIndex = uni_int(0, larval_males.size());
 
-    female.t_next = female.t_next + dForagingTime;
+    female.t_next += dForagingTime;
     // Transfer resources from the female to the selected larva
     larval_males[selectedLarvaIndex].feed(female.resources);
     female.resources = 0.0;
     larval_males[selectedLarvaIndex].t_next = female.t_next;
 
-    return &larval_males[selectedLarvaIndex];
-    // // Check maturity of larvae // shift to another function/
-    // if (larval_males[selectedLarvaIndex].check_mature(female.t_next)) {
-    //     tmp_males.push_back(larval_males[selectedLarvaIndex]);
-    //     larval_males.erase(larval_males.begin() + selectedLarvaIndex);
-    // }
+    return selectedLarvaIndex + 1;
 }
 
 bool Nest::reproduce(Individual<2>& female){
     if (bernoulli(const_sex_ratio)){
         Individual<1> son(female);
-        larval_males.push_back(son);
+        larval_males.emplace_back(son);
     }
     else {
         Individual<2> daughter(female);
-        larval_females.push_back(daughter);
+        larval_females.emplace_back(daughter);
     }
+    return true;
 }
 
+bool Nest::is_empty(){
+    if (adult_females.size() == 0){
+        return true;
+    }
+    else return false;
+}
 
 
 #endif /* Nest_hpp */
