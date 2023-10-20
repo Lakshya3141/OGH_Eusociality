@@ -22,7 +22,9 @@ public:
      std::vector<int> empty_nests;
 
      void initialise_pop();  
-     void simulate();               
+     void simulate();  
+     int choose_RndmMale();   
+     bool mate(Individual<2>& female);          
 private:
 };
 
@@ -101,14 +103,24 @@ void Population::simulate() {
                     int flarv_pos =  -index - 1;
                     bool birth = nests[cur_nest].larval_females[flarv_pos].check_mature(current.t_next);
                     bool disperser = nests[cur_nest].larval_females[flarv_pos].check_disperser();
+                    // FEMALE LARVA NEEDS TO BREED TOO
                     if (birth && disperser) {
+                        // mates, then disperses, look for empty nests
+                        // if can't mate, dies
+                        bool mated = mate(nests[cur_nest].larval_females[flarv_pos]);
+                        if (!mated) {
+                            continue;
+                        }
                         disperser_females.push_back(std::move(nests[cur_nest].larval_females[flarv_pos]));
                         nests[cur_nest].larval_females.erase(nests[cur_nest].larval_females.begin() + flarv_pos);
-                        // female needs to mate too
                         // NEED TO CHECK FOR EMPTY NESTS NOW
                     }
                     else if (birth) {
-                        // NEED 
+                        // mates, and if can't, dies
+                        bool mated = mate(nests[cur_nest].larval_females[flarv_pos]);
+                        if (!mated) {
+                            continue;
+                        }
                         nests[cur_nest].adult_females.push_back(std::move(nests[cur_nest].larval_females[flarv_pos]));
                         nests[cur_nest].larval_females.erase(nests[cur_nest].larval_females.begin() + flarv_pos);
                     }
@@ -134,4 +146,24 @@ void Population::simulate() {
     }
 }
 
+// returns index + 1 of selected male
+int Population::choose_RndmMale(){
+    if (adult_males.size() != 0) {
+        int index = uni_int(0, adult_males.size()) + 1;
+        return index;
+    }
+    else return 0;
+}
+
+// returns true if female finds mate
+bool Population::mate(Individual<2>& female){
+    int index = choose_RndmMale();
+    if (index){
+        female.mate(adult_males[index - 1]);
+        return true;
+    }
+    else {
+        return false;
+    }
+}
 #endif /* Population_hpp */
