@@ -134,8 +134,6 @@ void Population::simulate() {
                     }
                 }
             }
-            // if reproduce call nest level function
-            // that's all?
             else {
                 nests[cur_nest].reproduce(current);
             }

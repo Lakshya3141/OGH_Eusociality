@@ -19,7 +19,7 @@ public:
      std::vector<Individual<1> > adult_males;       // vector for males to fertilize female
      std::vector<Individual<2> > disperser_females; 
      std::vector<Nest> nests;   
-     std::vector<size_t> empty_nests; //JK: I guess this will contain vector indices for the empty nests? Then I would make it a size_t, not int
+     std::vector<int> empty_nests; //JK: I guess this will contain vector indices for the empty nests? Then I would make it a size_t, not int
 
      void initialise_pop();  
      void simulate();  
