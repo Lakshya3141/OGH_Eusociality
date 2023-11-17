@@ -118,6 +118,7 @@ void Population::simulate() {
                             if (empty > 0) {
                                 --empty;
                                 nests[empty].adult_females = {std::move(nests[current.nest_id].larval_females[index])};
+                                current.nest_id = empty; // Change nest ID too
                             }
                         } else {
                             bool mated = mate(nests[current.nest_id].larval_females[index]);
@@ -203,7 +204,8 @@ void Population::removeDeadMales() {
     auto Condition = [](const Individual<1>& male) {
         return male.t_death <= gtime;
     };
-    adult_males.erase(std::remove_if(adult_males.begin(), adult_males.end(), Condition), adult_males.end());
+    adult_males.erase(std::remove_if(adult_males.begin(), adult_males.end(), Condition), adult_males.end()); //LC4
+    // How about incorporating erase_if here itself
 }
 
 #endif /* Population_hpp */

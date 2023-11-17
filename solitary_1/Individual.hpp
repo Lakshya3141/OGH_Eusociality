@@ -45,6 +45,8 @@ public:
     double t_next = uni_real();                     // Impart an asynchronous start if need be
     double t_birth;
     unsigned long int ind_id;   // Inidividual identifier
+    unsigned long int mom_id;   // Mother ID
+    unsigned long int dad_id;   // Father IDW
     unsigned int nest_id;       // Nest identifier
     
     double phenotype_dispersal;
@@ -85,6 +87,7 @@ Individual<1>::Individual (const Individual<2>& mum) {
     is_larvae = true;
     mutate(); // individual is created then mutates
     ind_id = ++IndID;
+    mom_id = mum.ind_id;
 }
 
 // constructor for females (diploid)
@@ -106,6 +109,7 @@ Individual<2>::Individual (const Individual<2>& mum) {
     mutate();
     calculate_phenotype();
     ind_id = ++IndID;
+    mom_id = mum.ind_id;
 }
 
 // mate function // works
@@ -143,6 +147,8 @@ bool Individual<1>::check_mature(double& birth_time){
     else return false;
 }
 
+// LC: Inverse transform sampling
+// https://en.wikipedia.org/wiki/Inverse_transform_sampling
 template <> 
 bool Individual<2>::check_mature(double& birth_time){
     if (bernoulli(logistic(body_size, dLarvaIntercept, dLarvaSlope))) {
