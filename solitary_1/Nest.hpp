@@ -10,6 +10,7 @@
 
 #include "Individual.hpp"
 #include "Random.hpp"
+#include <algorithm>
 
 class Nest {
 public:
@@ -18,7 +19,7 @@ public:
     void reproduce(Individual<2>& female);
     int check_maturity(int& index, double c_time); //only for females
     bool is_empty();
-    bool task_check(Individual<2>& current);
+    void task_check(Individual<2>& current);
     size_t findFemaleIndexById(unsigned long int id);
     // temp vector to hold male adults and then move them to population level, delete the one at nest level
 
@@ -93,7 +94,7 @@ bool Nest::is_empty(){
 }
 
 // MIGHT NEED TO DELETE THIS
-bool Nest::task_check(Individual<2>& current){
+void Nest::task_check(Individual<2>& current){
     // LCI: Comfirm these
     current.is_foraging = bernoulli(logistic(larval_females.size() + larval_males.size(), current.phenotype_choice[0], current.phenotype_choice[1]));
     // current.t_prev = current.t_next;
