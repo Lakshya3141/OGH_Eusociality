@@ -24,7 +24,7 @@ double dDeathTime = 2.0;
 double gtime = 0.0;                 // Global time
 double dMaleLambda = 10.0;          // Average lifespan of male
 
-unsigned long int IndID = 0;
+// unsigned long int IndID = 0;
 
 double dMutRate = 1.0;              // Mutation probability
 double dMutBias = 0.0;              // Mutation Bias

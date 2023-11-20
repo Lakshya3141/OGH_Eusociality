@@ -176,7 +176,6 @@ bool Population::mate(Individual<2>& female){
     int index = choose_RndmMale();
     if (index){
         female.mate(adult_males[index - 1]);
-        female.is_mated = true;
         return true;
     }
     else {

@@ -17,7 +17,7 @@ public:
     Nest(Individual<2>& f);
     int feed(const double& mean, const double& SD);
     void reproduce(Individual<2>& female);
-    int check_maturity(int& index, double c_time); //only for females
+    int check_maturity(int index, double c_time); //only for females
     bool is_empty();
     void task_check(Individual<2>& current);
     size_t findFemaleIndexById(unsigned long int id);
@@ -35,7 +35,7 @@ public:
 // returns -1 if no mature
 // returns 0 if no disperser
 // returns 1 if matures and disperses 
-int Nest::check_maturity(int& index, double c_time){
+int Nest::check_maturity(int index, double c_time){
     // Check maturity of larvae // shift to another function/
     if(!larval_females[index].check_mature(c_time)){
         return -1;
@@ -44,8 +44,9 @@ int Nest::check_maturity(int& index, double c_time){
         return 1;
     }
     else {
-        adult_females.emplace_back(larval_females[index]);
-        larval_females.erase(larval_females.begin() + index);
+        // Below is handled at higher stage due to disperser issues
+        // adult_females.emplace_back(larval_females[index]);
+        // larval_females.erase(larval_females.begin() + index);
         return 0;
     }
 }
@@ -93,7 +94,7 @@ bool Nest::is_empty(){
     else return false;
 }
 
-// MIGHT NEED TO DELETE THIS
+
 void Nest::task_check(Individual<2>& current){
     // LCI: Comfirm these
     current.is_foraging = bernoulli(logistic(larval_females.size() + larval_males.size(), current.phenotype_choice[0], current.phenotype_choice[1]));

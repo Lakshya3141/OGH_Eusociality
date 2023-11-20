@@ -46,6 +46,11 @@ void remove_from_vec(std::vector<T>& v, const size_t idx) {
     v.pop_back();
 }
 
+static unsigned long int generateUniqueID() {
+    static unsigned long int idCounter = 1;  // Starts from 1, adjust as needed
+    return idCounter++;
+}
+
 //defining array + operator
 // template<typename T, unsigned long N>
 // std::array<T, N> operator+(const std::array<T, N>& a, const std::array<T, N>& b) {

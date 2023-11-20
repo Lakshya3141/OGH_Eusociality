@@ -30,13 +30,13 @@ public:
     bool is_larvae = false;                         // needs to be before constructor definition
 
     // Individual constructors
-    Individual() = default;
+    Individual();
     Individual(const Individual<2>& mum);   // male and female?
     // Individual(const Individual<2>& mum);   // female
 
     Haplotype sperm;
     std::array<Haplotype, Ploidy> genome;           // genome of individual with 1 or 2 haplotypes
-    Individual<2>* mother;
+    // Individual<2>* mother;
     void mate(const Individual<1>& male); // revisit this too
     void mutate();
     void calculate_phenotype();
@@ -44,7 +44,7 @@ public:
     double t_death;
     double t_next = uni_real();                     // Impart an asynchronous start if need be
     double t_birth;
-    unsigned long int ind_id;   // Inidividual identifier
+    int ind_id;
     unsigned long int mom_id;   // Mother ID
     unsigned long int dad_id;   // Father IDW
     unsigned int nest_id;       // Nest identifier
@@ -55,6 +55,7 @@ public:
     void survival();
     bool check_mature(double& birth_time);
     bool check_disperser();
+    // static unsigned long int generateUniqueID();
 
     bool is_disperser = false;
     bool is_foraging = false;      // If not foraging, then brooding
@@ -65,9 +66,14 @@ public:
     int num_fem_offspring = 0;  // number of female offspring a foundress will produce
     int num_larva = 0;
     int num_female_larva = 0;
-    
+    static int IndID;   // Declaring static member variable
 };
 
+// template <int Ploidy>
+// static unsigned long int Individual<Ploidy>::generateUniqueID() {
+//     static unsigned long int idCounter = 1;  // Starts from 1, adjust as needed
+//     return idCounter++;
+// }
 
 // calculate phenotype // works
 template<>
@@ -76,6 +82,15 @@ void Individual<2>::calculate_phenotype() {
     for(int i = 0; i < 2; ++i) {
         phenotype_choice[i] = (genome[0].genes_choice[i] + genome[1].genes_choice[i]) * 0.5;
     }
+}
+
+template <int Ploidy>
+int Individual<Ploidy>::IndID = 0;
+
+// default constructor
+template <int Ploidy>
+Individual<Ploidy>::Individual() {
+    ind_id = ++IndID;
 }
 
 // constructor for males (haploid)
@@ -93,7 +108,6 @@ Individual<1>::Individual (const Individual<2>& mum) {
 // constructor for females (diploid)
 template <>
 Individual<2>::Individual (const Individual<2>& mum) {
-
     // daughter inherits one haplotype from sperm stored with mum
     genome[0] = mum.sperm;
     //genome[0].genes_dispersal = genome_dad[0].genes_dispersal;
@@ -103,7 +117,7 @@ Individual<2>::Individual (const Individual<2>& mum) {
     for(int i = 0; i < 2; ++i) {
         genome[1].genes_choice[i] = mum.genome[bernoulli()].genes_choice[i];
     }
-
+    
     nest_id = mum.nest_id;
     is_larvae = true;
     mutate();
@@ -116,6 +130,8 @@ Individual<2>::Individual (const Individual<2>& mum) {
 template <>
 void Individual<2>::mate(const Individual<1>& male) {
     sperm = male.genome[0]; // females store sperm from mate
+    genome[0] = sperm;
+    is_mated = true;
 }
 
 // mutate function // works
@@ -131,8 +147,9 @@ template <>
 void Individual<2>::survival(){
     if ((is_foraging && !bernoulli(dSurvForage)) ^ (!is_foraging && !bernoulli(dSurvBrood))) {
         is_alive = false;
-        t_next = t_next - (is_foraging ? dForagingTime : dBroodingTime) + dDeathTime;
-        t_death = t_next;
+        // t_next = t_next - (is_foraging ? dForagingTime : dBroodingTime) + dDeathTime;
+        t_death = gtime + dDeathTime;
+        t_next = t_death;
     }
 }
 
@@ -162,6 +179,7 @@ bool Individual<2>::check_mature(double& birth_time){
 template <>
 bool Individual<2>::check_disperser(){
     if (bernoulli(phenotype_dispersal)) {
+        is_disperser = true;
         return true;
     }
     else return false;
