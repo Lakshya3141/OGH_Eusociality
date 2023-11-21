@@ -29,12 +29,12 @@ int IndID = 0;
 double dMutRate = 1.0;              // Mutation probability
 double dMutBias = 0.0;              // Mutation Bias
 double dMutEffect = 0.02;           // Mutation effect
-double dSurvForage = 0.9;             // Survival probability at each time step for all bees
-double dSurvBrood = 0.6;
+double dSurvForage = 1.0;             // Survival probability at each time step for all bees
+double dSurvBrood = 1.0;
 double dForagingMean = 1.0;         // Mean of normal foraging curve
 double dForagingSD = 0.3;           // SD of normal foraging curve
 double dMaturingSize = 1.0;         // Maturing size of larvae
 unsigned int max_nests = 5;      // Maximum number of nests
-double const_sex_ratio = 0.5;       // male sex ratio
-int max_events = 10000;             // max number of events to go through
+double const_sex_ratio = 0.1;       // male sex ratio
+int max_events = 20;             // max number of events to go through
 #endif /* Parameters_hpp */

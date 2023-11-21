@@ -92,7 +92,7 @@ int main() {
     std::cout << "3) MATING AND RANDOM MALE  \n" << std::endl;
     for(auto& nest: myPop.nests) { 
         myPop.mate(nest.adult_females[0]);
-        printIndividualInfo(nest.adult_females[0]);
+        // printIndividualInfo(nest.adult_females[0]);
     }
     
     std::vector<Individual<1> > dumMalesVector;
@@ -100,13 +100,30 @@ int main() {
     myPop.adult_males.clear();
     Individual<2> dumFemale(++IndID);
     std::cout << "When no males, mate returns: " << myPop.mate(dumFemale) << std::endl;
-    printIndividualInfo(dumFemale);
+    // printIndividualInfo(dumFemale);
     myPop.adult_males = dumMalesVector;
     std::cout << "When males, mate returns: " << myPop.mate(dumFemale) << std::endl;
-    printIndividualInfo(dumFemale);
+    // printIndividualInfo(dumFemale);
 
     // 4) Checking update_emptynests
-    std::cout << "4) EMTPY NEST  \n" << std::endl;
+    std::cout << "\n4) EMPTY NEST  \n" << std::endl;
+    Population dumPop = myPop;
+    myPop.nests[1].adult_females.clear();
+    myPop.nests[3].adult_females.clear();
+
+    for(int i = 0; i < 10; i++) {
+        // std::cout << "Empty nest given: " << myPop.update_emptyNests() - 1<< std::endl;
+    }
+
+    // 5) Checking population simluate
+    std::cout << "4) SIMULATE  \n" << std::endl;
+
+    std::cout << std::fixed;
+    std::cout << std::setprecision(2);
+
+    myPop = dumPop;
+    gtime = 0.010001;
+    myPop.simulate_tst();
 
     return 0;
 }

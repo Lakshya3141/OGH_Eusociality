@@ -37,6 +37,9 @@ public:
      int update_emptyNests();
      bool mate(Individual<2>& female);     
      void removeDeadMales();
+
+     // TST
+     void simulate_tst();
 };
 
 auto cmptime = [](const track_time& a, const track_time& b) { return a.time > b.time; };
@@ -61,6 +64,111 @@ void Population::initialise_pop() {
     }
 }
 
+// TST
+void Population::simulate_tst() {
+    // Create a priority queue to track individuals by their next action time
+    std::priority_queue<track_time, std::vector<track_time>, decltype(cmptime)> event_queue(cmptime);
+
+    // Initialize the event queue with individuals and their initial next action times
+    for (auto& nest : nests) {
+        for (auto& individual : nest.adult_females) {
+            event_queue.push(track_time(&individual));
+        }
+    }
+
+    // Simulate for a fixed number of events/individual updates
+    for (int event = 0; event < max_events; ++event) {
+        
+        if (event_queue.empty()) {
+            // No more events to process
+            std::cout << "ERROR: event_queue empty" << std::endl;
+            break;
+        }
+        
+        if (event % 10000 == 0) {
+            removeDeadMales();
+        }
+
+        // Get the individual with the earliest next action time
+        track_time next_event = event_queue.top();
+        std::cout << "Prepop Qlen: " << event_queue.size() << std::endl;
+        event_queue.pop();
+        std::cout << "Pospop Qlen: " << event_queue.size() << std::endl;
+        Individual<2> current = *next_event.ind;
+        // TST // 
+        std::cout << "E: " << event << " | Ind: " << current.ind_id << " | GT: " << gtime 
+        << " | tn_bef: " << current.t_next <<  " | Alive_before: " << (current.is_alive ? "YES" : "NO ") 
+        << " | Task_bef: " << (current.is_foraging ? "FOR":"REP") << " | Qlen: " << event_queue.size() << std::endl;
+        gtime = current.t_next;
+
+        // Last task survival check
+        if (current.is_alive) { 
+            // if (current.is_foraging) {
+            //     int index = nests[current.nest_id].feed(dForagingMean, dForagingSD);
+            //     if (index < 0) {
+            //         index = -index - 1;
+            //         // edit index setting here
+            //         if (nests[current.nest_id].larval_males[-index].check_mature(gtime)) {
+            //             adult_males.push_back(std::move(nests[current.nest_id].larval_males[-index]));
+            //             // nests[current.nest_id].larval_males.erase(nests[current.nest_id].larval_males.begin() + (-index));
+            //             remove_from_vec(nests[current.nest_id].larval_males, -index);
+            //         }
+            //     } else if (index > 0) {
+            //         --index;
+            //         // edit index setting here
+            //         if (nests[current.nest_id].larval_females[index].check_mature(gtime)) {
+            //             // Need to check for task since check_task moved to nest level
+            //             nests[current.nest_id].task_check(nests[current.nest_id].larval_females[index]);
+            //             if (nests[current.nest_id].larval_females[index].check_disperser()) {
+            //                 bool mated = mate(nests[current.nest_id].larval_females[index]);
+            //                 if (!mated) {
+            //                     continue; //LC3 :: remove this                            
+            //                 }
+            //                 int empty = update_emptyNests();
+            //                 if (empty > 0) {
+            //                     --empty;
+            //                     nests[empty].adult_females = {std::move(nests[current.nest_id].larval_females[index])};
+            //                     current.nest_id = empty; // Change nest ID too
+            //                 }
+            //             } else {
+            //                 bool mated = mate(nests[current.nest_id].larval_females[index]);
+            //                 if (!mated) {
+            //                     continue; //LC3 :: remove this  
+            //                 }
+            //                 nests[current.nest_id].adult_females.push_back(std::move(nests[current.nest_id].larval_females[index]));
+            //             }
+            //             // nests[current.nest_id].larval_females.erase(nests[current.nest_id].larval_females.begin() + index);
+            //             remove_from_vec(nests[current.nest_id].larval_females, index);
+            //         }
+            //     }
+            // } else {
+            //     nests[current.nest_id].reproduce(current);
+            //     if(!current.is_mated) {
+            //         bool dummy = mate(current);
+            //     } 
+            // }
+            
+            // Task check
+            nests[current.nest_id].task_check(current);
+            current.survival();
+            // Reinsert the individual into the event queue with the new next action time
+            event_queue.push(track_time(&current));
+        } else {
+            // Find the position of the current individual in its nest's adult_females vector
+            size_t ind = nests[current.nest_id].findFemaleIndexById(current.ind_id);
+            if (ind - 1) {
+                remove_from_vec(nests[current.nest_id].adult_females, ind - 1);
+            } else {
+                // LC3 :: Throw error, need to learn error handling
+            }
+        }
+        // TST //
+        std::cout << "     | Ind: " << current.ind_id << " | GT: " << gtime 
+        << " | tn_now: " << current.t_next <<  " | Alive_before: " << (current.is_alive ? "YES" : "NO ") 
+        << " | Task_bef: " << (current.is_foraging ? "FOR":"REP") << " | Qlen: " << event_queue.size() << std::endl;
+    }
+}
+
 void Population::simulate() {
     // Create a priority queue to track individuals by their next action time
     std::priority_queue<track_time, std::vector<track_time>, decltype(cmptime)> event_queue(cmptime);
@@ -74,6 +182,7 @@ void Population::simulate() {
 
     // Simulate for a fixed number of events/individual updates
     for (int event = 0; event < max_events; ++event) {
+        
         if (event_queue.empty()) {
             // No more events to process
             std::cout << "ERROR: event_queue empty" << std::endl;
@@ -88,7 +197,8 @@ void Population::simulate() {
         track_time next_event = event_queue.top();
         event_queue.pop();
         Individual<2> current = *next_event.ind;
-        
+        // TST // 
+        std::cout << "E: " << event << " | Ind: " << current.ind_id << " | GT: " << gtime << " | tn_bef: " << current.t_next <<  " | Alive_before: " << (current.is_alive ? "YES" : "NO ") << " | Task_bef: " << (current.is_foraging ? "FOR":"REP") << std::endl;
         gtime = current.t_next;
 
         // Last task survival check
@@ -140,12 +250,6 @@ void Population::simulate() {
             
             // Task check
             nests[current.nest_id].task_check(current);
-            
-            if (current.is_foraging) {
-                current.t_next += dForagingTime;
-            } else {
-                current.t_next += dBroodingTime; 
-            }
             current.survival();
             // Reinsert the individual into the event queue with the new next action time
             event_queue.push(track_time(&current));
@@ -158,7 +262,8 @@ void Population::simulate() {
                 // LC3 :: Throw error, need to learn error handling
             }
         }
-        
+        // TST //
+        std::cout << "     | Ind: " << current.ind_id << " | GT: " << gtime << " | tn_now: " << current.t_next <<  " | Alive_before: " << (current.is_alive ? "YES" : "NO ") << " | Task_bef: " << (current.is_foraging ? "FOR":"REP") << std::endl;
     }
 }
 
@@ -192,7 +297,7 @@ int Population::update_emptyNests() {
             empty_nests.push_back(i);
         }
     }
-    printVector(empty_nests); // TST
+    // printVector(empty_nests); // TST
 
     if (empty_nests.empty()) {
         return 0; // No empty nests found
