@@ -30,96 +30,94 @@ void printIndividualDetails(const Individual<Ploidy>& individual) {
     std::cout << std::endl;
 }
 
+
 int main() {
     // 1) Constructor: Create a Nest with one female and add 9 more females
-    Individual<2> firstFemale;
-    std::cout << firstFemale.ind_id << "\n\n" << std::endl;
-    Nest myNest(firstFemale);
-    // std::cout << IndID << "\n\n" << std::endl;
-    // Create 9 more females, mutate them, and add to the adult_females vector
+    Individual<2> firstFemale(++IndID);
+    
+    firstFemale.genome[0].genes_choice[0] = 2.0;
+    firstFemale.genome[0].genes_choice[1] = 3.0;
+    firstFemale.calculate_phenotype();
+    Nest myNest(1, firstFemale);
+    Individual<1> male(++IndID);
+    // printIndividualDetails(firstFemale);
+    male.genome[0].genes_choice[0] = 4.0; // Mutate the male sperm before mating
+    printIndividualDetails(male);
+
+    // Create 4 more females, mutate them, and add to the adult_females vector
     for (int i = 0; i < 4; ++i) {
-        Individual<2> female;
+        Individual<2> female(++IndID);
+        female.nest_id = myNest.nest_id;
         female.mutate();
+        female.calculate_phenotype();
         myNest.adult_females.push_back(female);
     }
 
     // Print details of all females in the nest
     std::cout << "Initial Nest Details:" << std::endl;
-    for (const auto& female : myNest.adult_females) {
+    for (auto& female : myNest.adult_females) {
+        female.mate(male); // To confirm if individuals mated
         printIndividualDetails(female);
-        // std::cout << female.ind_id << "\n";
     }
-    std::cout << "\n" << firstFemale.ind_id << "\n";
-    std::cout << "\n" << myNest.adult_females[0].ind_id << "\n";
-    // printIndividualDetails(firstFemale);
-    // printIndividualDetails(myNest.adult_females[0]);
-    // // 2) Check_maturity: Test the check_maturity function
-    // std::cout << "\nTesting check_maturity function:" << std::endl;
+    print();
+    printIndividualDetails(myNest.adult_females[0]);
 
-    // // Case 1: Female with body size 0 (should not mature)
-    // Individual<2> immatureFemale;
-    // immatureFemale.body_size = 0.0;
-    // int result1 = myNest.check_maturity(0, 0.0);
-    // std::cout << "Case 1 Result: " << result1 << std::endl;  // Expected: -1
+    std::cout << "\nTesting findFemale function:" << std::endl;
 
-    // // Case 2: Female with body size 10 (should mature)
-    // Individual<2> matureFemale;
-    // matureFemale.body_size = 10.0;
-    // int result2 = myNest.check_maturity(0, 0.0);
-    // std::cout << "Case 2 Result: " << result2 << std::endl;  // Expected: 1
+    std::cout << myNest.findFemaleIndexById(1) - 1 << std::endl;
+    std::cout << myNest.findFemaleIndexById(3) - 1<< std::endl;
+    std::cout << myNest.findFemaleIndexById(8) - 1 << std::endl;
+    std::cout << myNest.findFemaleIndexById(6) - 1<< std::endl;
 
-    // // Case 3: Female with body size 10 and is_disperser set to true (should disperse)
-    // Individual<2> disperserFemale;
-    // disperserFemale.body_size = 10.0;
-    // disperserFemale.is_disperser = true;
-    // int result3 = myNest.check_maturity(0, 0.0);
-    // std::cout << "Case 3 Result: " << result3 << std::endl;  // Expected: 1
+    // 4) Reproduce: Test the reproduce function
+    std::cout << "\nTesting reproduce function:" << std::endl;
 
-    // // 3) feed: Test the feed function
-    // std::cout << "\nTesting feed function:" << std::endl;
+    // Mated Female
+    Individual<2> unmatedFemale(++IndID);
+    
+    for(int i = 0; i < 5; i++){
+        // myNest.reproduce(unmatedFemale);
+        // std::cout << "#LMales: " << myNest.larval_males.size() << std::endl;  // Expected: 1
+    }
+    std::cout << "#LFemales: " << myNest.larval_females.size() << "  |  #LMales: " << myNest.larval_males.size()<< std::endl;  // Expected: 1
 
-    // // Create instances of male and female larva vectors
-    // myNest.larval_males.resize(5);
-    // myNest.larval_females.resize(5);
+    for(int i = 0; i < 10; i++){
+        myNest.reproduce(myNest.adult_females[0]);
+        // std::cout << "#LMales: " << myNest.larval_males.size() << std::endl;  // Expected: 1
+    }
+    std::cout << "#LFemales: " << myNest.larval_females.size() << "  |  #LMales: " << myNest.larval_males.size()<< std::endl;  // Expected: 1
 
-    // // Call feed function and print the result
-    // int feedResult = myNest.feed(5.0, 1.0);
-    // std::cout << "Feed Result: " << feedResult << std::endl;
+    //std::cout << "LMales after 5 unmated reproduction: \n" << std::endl;
+    for (auto& male : myNest.larval_males) {
+        // printIndividualDetails(male);
+    }
 
-    // // Print the resources value of the chosen larva
-    // if (feedResult < 0) {
-    //     std::cout << "Fed Larva Resources: " << myNest.larval_males[-feedResult - 1].body_size << std::endl;
-    // } else if (feedResult > 0) {
-    //     std::cout << "Fed Larva Resources: " << myNest.larval_females[feedResult - 1].body_size << std::endl;
-    // } else {
-    //     std::cout << "No Larvae Fed." << std::endl;
-    // }
 
-    // // 4) Reproduce: Test the reproduce function
-    // std::cout << "\nTesting reproduce function:" << std::endl;
+    for (auto& male : myNest.larval_females) {
+        // printIndividualDetails(male);
+    }
 
-    // // Mated Female
-    // Individual<2> matedFemale;
-    // matedFemale.is_mated = true;
-    // myNest.reproduce(matedFemale);
-    // std::cout << "Number of Larval Females: " << myNest.larval_females.size() << std::endl;  // Expected: 1
+    // 3) feed: Test the feed function
+    std::cout << "\nTesting feed function:" << std::endl;
 
-    // // Unmated Female
-    // Individual<2> unmatedFemale;
-    // unmatedFemale.is_mated = false;
-    // myNest.reproduce(unmatedFemale);
-    // std::cout << "Number of Larval Males: " << myNest.larval_males.size() << std::endl;  // Expected: 1
+    // Call feed function and print the result
 
-    // // 5) findFemaleIndexById: Test the findFemaleIndexById function
-    // std::cout << "\nTesting findFemaleIndexById function:" << std::endl;
+    // myNest.emptyAdultFemales();
+    myNest.larval_females.clear();
+    myNest.larval_males.clear();
 
-    // // Search for the index of the first female (should be present)
-    // size_t index1 = myNest.findFemaleIndexById(firstFemale.ind_id);
-    // std::cout << "Index of First Female: " << index1 << std::endl;  // Expected: 1
+    for (int i = 0; i < 10; i++) {
+        int feedResult = myNest.feed(5.0, 1.0);
+        int index = std::abs(feedResult) - 1;
+        if (feedResult > 0) {
+            std::cout << "FEMALE: " << index << " |Body Size: " << myNest.larval_females[index].body_size << "\n" << std::endl;
+        }
+        else if (feedResult < 0) {
+            std::cout << "MALE: "<< index << " |Body Size: " << myNest.larval_males[index].body_size << "\n" << std::endl;
+        } else std::cout << "No feed" << std::endl;
+        
+    }
 
-    // // Search for the index of an invalid female ID (should not be present)
-    // size_t index2 = myNest.findFemaleIndexById(1000);  // Assuming 1000 is an invalid ID
-    // std::cout << "Index of Invalid Female ID: " << index2 << std::endl;  // Expected: 0
 
     return 0;
 }

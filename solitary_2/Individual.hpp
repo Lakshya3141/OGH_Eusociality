@@ -30,8 +30,8 @@ public:
     bool is_larvae = false;                         // needs to be before constructor definition
 
     // Individual constructors
-    Individual(const int id);
-    Individual(const int id, const Individual<2>& mum);   // male and female?
+    Individual();
+    Individual(const Individual<2>& mum);   // male and female?
     // Individual(const Individual<2>& mum);   // female
 
     Haplotype sperm;
@@ -55,6 +55,7 @@ public:
     void survival();
     bool check_mature(double& birth_time);
     bool check_disperser();
+    // static unsigned long int generateUniqueID();
 
     bool is_disperser = false;
     bool is_foraging = false;      // If not foraging, then brooding
@@ -65,8 +66,14 @@ public:
     int num_fem_offspring = 0;  // number of female offspring a foundress will produce
     int num_larva = 0;
     int num_female_larva = 0;
+    static int IndID;   // Declaring static member variable
 };
 
+// template <int Ploidy>
+// static unsigned long int Individual<Ploidy>::generateUniqueID() {
+//     static unsigned long int idCounter = 1;  // Starts from 1, adjust as needed
+//     return idCounter++;
+// }
 
 // calculate phenotype // works
 template<>
@@ -77,37 +84,34 @@ void Individual<2>::calculate_phenotype() {
     }
 }
 
-// default constructor male
-template <>
-Individual<1>::Individual(const int id) {
-    ind_id = id;
-    t_death = 0.0;
-}
+template <int Ploidy>
+int Individual<Ploidy>::IndID = 0;
 
-// default constructor female
-template <>
-Individual<2>::Individual(const int id) {
-    ind_id = id;
-    calculate_phenotype();
+// default constructor
+template <int Ploidy>
+Individual<Ploidy>::Individual() {
+    ind_id = ++IndID;
 }
 
 // constructor for males (haploid)
 template <>
-Individual<1>::Individual (const int id, const Individual<2>& mum) {
+Individual<1>::Individual (const Individual<2>& mum) {
     // son inherits genes from mum (with 50:50 chance of each haplotype)
     genome[0].genes_dispersal = mum.genome[bernoulli()].genes_dispersal;
     genome[0].genes_choice = mum.genome[bernoulli()].genes_choice;
     is_larvae = true;
     mutate(); // individual is created then mutates
-    ind_id = id;
+    ind_id = ++IndID;
     mom_id = mum.ind_id;
 }
 
 // constructor for females (diploid)
 template <>
-Individual<2>::Individual (const int id, const Individual<2>& mum) {
+Individual<2>::Individual (const Individual<2>& mum) {
     // daughter inherits one haplotype from sperm stored with mum
     genome[0] = mum.sperm;
+    //genome[0].genes_dispersal = genome_dad[0].genes_dispersal;
+    //genome[0].genes_choice = genome_dad[0].genes_choice;
     
     genome[1].genes_dispersal = mum.genome[bernoulli()].genes_dispersal;
     for(int i = 0; i < 2; ++i) {
@@ -117,16 +121,16 @@ Individual<2>::Individual (const int id, const Individual<2>& mum) {
     nest_id = mum.nest_id;
     is_larvae = true;
     mutate();
-    ind_id = id;
-    mom_id = mum.ind_id;
     calculate_phenotype();
+    ind_id = ++IndID;
+    mom_id = mum.ind_id;
 }
 
 // mate function // works
 template <>
 void Individual<2>::mate(const Individual<1>& male) {
     sperm = male.genome[0]; // females store sperm from mate
-    // genome[0] = sperm;
+    genome[0] = sperm;
     is_mated = true;
 }
 

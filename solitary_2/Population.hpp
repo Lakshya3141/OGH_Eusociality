@@ -26,6 +26,7 @@ struct track_time {
 class Population {
 public:
     Population() = default;
+
      std::vector<Individual<1> > adult_males;       // vector for males to fertilize female
      // std::vector<Individual<2> > disperser_females; 
      std::vector<Nest> nests;   
@@ -36,7 +37,8 @@ public:
      int choose_RndmMale();
      int update_emptyNests();
      bool mate(Individual<2>& female);     
-     void removeDeadMales();
+     void removeDeadMales();     
+private:
 };
 
 auto cmptime = [](const track_time& a, const track_time& b) { return a.time > b.time; };
@@ -45,19 +47,17 @@ auto cmptime = [](const track_time& a, const track_time& b) { return a.time > b.
 void Population::initialise_pop() {
     
     // population founders (using default constructor, which calls default constructor of Haplotype)
+    Individual<2> eve;
+    eve.calculate_phenotype();
+    Individual<1> adam;
+    adam.ind_id = IndID;
     
-    Individual<1> adam(++IndID);
-    adult_males.push_back(adam);
-    double cnt = 2.0; //TST
-    
+    eve.mate(adam); // female mated with adam
+    eve.calculate_phenotype();
     for(int i=0; i < max_nests; ++i) {
-        Individual<2> eve(++IndID);
-        // eve.mate(adam); // TST UNCOMMENT
         eve.nest_id = i;
-        eve.genome[0].genes_dispersal = cnt; //TST
-        cnt += 0.5; // TST
-        Nest dumNest(i, eve);
-        nests.push_back(dumNest);
+        eve.ind_id = ++IndID;
+        nests.emplace_back(eve);  // loops through each nest and adds mated founding female
     }
 }
 
@@ -174,7 +174,6 @@ int Population::choose_RndmMale(){
 // returns true if female finds mate
 bool Population::mate(Individual<2>& female){
     int index = choose_RndmMale();
-    // std::cout << "Male index chosen: " << index - 1 << std::endl;
     if (index){
         female.mate(adult_males[index - 1]);
         return true;
@@ -184,7 +183,7 @@ bool Population::mate(Individual<2>& female){
     }
 }
 
-// updates empty nest list and returns empty one from that LC5
+// updates empty nest list and returns empty one from that
 int Population::update_emptyNests() {
     empty_nests.clear();
     for (size_t i = 0; i < nests.size(); ++i) {
@@ -192,8 +191,6 @@ int Population::update_emptyNests() {
             empty_nests.push_back(i);
         }
     }
-    printVector(empty_nests); // TST
-
     if (empty_nests.empty()) {
         return 0; // No empty nests found
     } else {
