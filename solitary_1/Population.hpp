@@ -40,6 +40,7 @@ public:
 
      // TST
      void simulate_tst();
+     int calculateTotalAdultFemales();
 };
 
 auto cmptime = [](const track_time& a, const track_time& b) { return a.time > b.time; };
@@ -63,6 +64,18 @@ void Population::initialise_pop() {
         nests.push_back(dumNest);
     }
 }
+
+// TST
+int Population::calculateTotalAdultFemales() {
+    int totalAdultFemales = 0;
+
+    for (const auto& nest : nests) {
+        totalAdultFemales += static_cast<int>(nest.adult_females.size());
+    }
+
+    return totalAdultFemales;
+}
+
 
 // TST
 void Population::simulate_tst() {
@@ -91,14 +104,16 @@ void Population::simulate_tst() {
 
         // Get the individual with the earliest next action time
         track_time next_event = event_queue.top();
-        std::cout << "Prepop Qlen: " << event_queue.size() << std::endl;
+        // std::cout << "Prepop Qlen: " << event_queue.size() << std::endl; // TST
         event_queue.pop();
-        std::cout << "Pospop Qlen: " << event_queue.size() << std::endl;
+        // std::cout << "Pospop Qlen: " << event_queue.size() << std::endl; // TST
         Individual<2> current = *next_event.ind;
         // TST // 
         std::cout << "E: " << event << " | Ind: " << current.ind_id << " | GT: " << gtime 
         << " | tn_bef: " << current.t_next <<  " | Alive_before: " << (current.is_alive ? "YES" : "NO ") 
         << " | Task_bef: " << (current.is_foraging ? "FOR":"REP") << " | Qlen: " << event_queue.size() << std::endl;
+        // current.is_alive = false; // TST
+
         gtime = current.t_next;
 
         // Last task survival check
@@ -153,21 +168,39 @@ void Population::simulate_tst() {
             current.survival();
             // Reinsert the individual into the event queue with the new next action time
             event_queue.push(track_time(&current));
+
+            // HERE //
+            std::cout << "Queue: [ ";
+            std::priority_queue<track_time, std::vector<track_time>, decltype(cmptime)> temp_queue(event_queue);
+            while (!temp_queue.empty()) {
+                track_time temp_event = temp_queue.top();
+                temp_queue.pop();
+                std::cout << "(" << temp_event.ind->ind_id << ", " << temp_event.time << ")";
+                if (!temp_queue.empty()) {
+                    std::cout << ", ";
+                }
+            }
+            std::cout << " ]\n\n";
         } else {
             // Find the position of the current individual in its nest's adult_females vector
             size_t ind = nests[current.nest_id].findFemaleIndexById(current.ind_id);
-            if (ind - 1) {
+            // std::cout << "INDEX: " << ind << std::endl;
+            if (ind) {
+                std::cout << "Len bef: " << nests[current.nest_id].adult_females.size() << std::endl; // TST
                 remove_from_vec(nests[current.nest_id].adult_females, ind - 1);
+                std::cout << "Len aft: " << nests[current.nest_id].adult_females.size() << std::endl; // TST
             } else {
                 // LC3 :: Throw error, need to learn error handling
             }
         }
         // TST //
-        std::cout << "     | Ind: " << current.ind_id << " | GT: " << gtime 
-        << " | tn_now: " << current.t_next <<  " | Alive_before: " << (current.is_alive ? "YES" : "NO ") 
-        << " | Task_bef: " << (current.is_foraging ? "FOR":"REP") << " | Qlen: " << event_queue.size() << std::endl;
+        // std::cout << "     | Ind: " << current.ind_id << " | GT: " << gtime 
+        // << " | tn_now: " << current.t_next <<  " | Alive_before: " << (current.is_alive ? "YES" : "NO ") 
+        // << " | Task_bef: " << (current.is_foraging ? "FOR":"REP") << " | Qlen: " << event_queue.size() << std::endl;
+        // std::cout << "Adult Len Females: " << calculateTotalAdultFemales() << std::endl; // TST
     }
 }
+
 
 void Population::simulate() {
     // Create a priority queue to track individuals by their next action time

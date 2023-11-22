@@ -13,6 +13,7 @@
 #include <array>
 #include <vector>
 #include <cmath>
+#include <iostream>
 
 unsigned int simulationID = static_cast<unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count()); // sample a seed
 std::mt19937 rn(simulationID); // seed the random number generator
