@@ -43,8 +43,20 @@ double logistic(T x, double intercept, double slope) {
 
 template <typename T = double>
 void remove_from_vec(std::vector<T>& v, const size_t idx) {
+    std::cout << "start of remove from vec" << std::endl;
     if (auto back_idx = v.size()-1; idx != back_idx) v[idx] = std::move(v[back_idx]);
     v.pop_back();
+    std::cout << "end of remove from vec" << std::endl;
+}
+
+template <typename T = double>
+void remove_from_vec2(std::vector<T>& v, typename std::vector<T>::iterator it) {
+    std::cout << "start of remove from vec" << std::endl;
+    if (it != v.end() - 1) {
+        *it = std::move(v.back());
+    }
+    v.pop_back();
+    std::cout << "end of remove from vec" << std::endl;
 }
 
 void print(){

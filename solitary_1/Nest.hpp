@@ -15,9 +15,9 @@
 
 class Nest {
 public:
-    Nest(const int id, const Individual<2>& f);
+    Nest(const int nid, const Individual<2>& f);
     int feed(const double& mean, const double& SD);
-    void reproduce(Individual<2>& female);
+    int reproduce(Individual<2>& female);
     bool is_empty();
     void task_check(Individual<2>& current);
     size_t findFemaleIndexById(unsigned long int id);
@@ -55,20 +55,23 @@ int Nest::feed(const double& mean, const double& SD) {
     return 0;
 }
 
-Nest::Nest(const int id, const Individual<2>& f) {
+Nest::Nest(const int nid, const Individual<2>& f) {
     adult_females.push_back(f);
-    nest_id = id;
+    nest_id = nid;
 } // Constructor for nest
 
 // produces males if not mated or with bernoulli(male sex ratio)
-void Nest::reproduce(Individual<2>& female){
+// returns 0 if male born, 1 if female
+int Nest::reproduce(Individual<2>& female){
     if (bernoulli(const_sex_ratio) || !female.is_mated) {
-        Individual<1> son(++IndID, female);
+        Individual<1> son(IndID++, female);
         larval_males.emplace_back(son);
+        return 0;
     }
     else {
-        Individual<2> daughter(++IndID, female);
+        Individual<2> daughter(IndID++, female);
         larval_females.emplace_back(daughter);
+        return 1;
     }
 }
 

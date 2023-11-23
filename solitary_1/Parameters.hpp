@@ -9,7 +9,7 @@
 #define Parameters_hpp
 
 // Below we will have some basic parameters to build the code
-double dInitDispersal = 1.0;        // Initial value of the dispersal gene
+double dInitDispersal = 0.0;        // Initial value of the dispersal gene
 // Logistic expression looks like 1/(1+exp(a+b*x))
 double dLarvaIntercept = 5.0;       // value of parameter a in larval hatching logistic expression
 double dLarvaSlope = -5.0;           // value of parameter a in larval hatching logistic expression
@@ -36,5 +36,5 @@ double dForagingSD = 0.3;           // SD of normal foraging curve
 double dMaturingSize = 1.0;         // Maturing size of larvae
 unsigned int max_nests = 5;      // Maximum number of nests
 double const_sex_ratio = 0.1;       // male sex ratio
-int max_events = 20;             // max number of events to go through
+int max_events = 200;             // max number of events to go through
 #endif /* Parameters_hpp */

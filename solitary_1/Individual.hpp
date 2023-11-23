@@ -174,6 +174,11 @@ bool Individual<2>::check_mature(double& birth_time){
 
 template <>
 bool Individual<2>::check_disperser(){
+
+    // LCIMP
+    if (phenotype_dispersal < 0) {
+        phenotype_dispersal = 0.0;
+    }
     if (bernoulli(phenotype_dispersal)) {
         is_disperser = true;
         return true;

@@ -69,7 +69,7 @@ int main() {
     for(int i = 0; i < 5; i++) {
         Individual<1> dumMale(++IndID);
         dumMale.t_death = cnt;
-        dumMale.genome[0].genes_dispersal = cnt;
+        dumMale.genome[0].genes_choice[0] = cnt;
         cnt++;
         myPop.adult_males.push_back(dumMale);
     }
@@ -92,13 +92,13 @@ int main() {
     std::cout << "3) MATING AND RANDOM MALE  \n" << std::endl;
     for(auto& nest: myPop.nests) { 
         myPop.mate(nest.adult_females[0]);
-        // printIndividualInfo(nest.adult_females[0]);
+        printIndividualInfo(nest.adult_females[0]);
     }
     
     std::vector<Individual<1> > dumMalesVector;
     dumMalesVector = myPop.adult_males;
     myPop.adult_males.clear();
-    Individual<2> dumFemale(++IndID);
+    Individual<2> dumFemale(IndID++);
     std::cout << "When no males, mate returns: " << myPop.mate(dumFemale) << std::endl;
     // printIndividualInfo(dumFemale);
     myPop.adult_males = dumMalesVector;
