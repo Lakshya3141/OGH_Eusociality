@@ -155,7 +155,9 @@ void Population::simulate_tst() {
                         // TST
                         int old_lmales = nests[current->nest_id].larval_males.size();
                         int old_amales = adult_males.size();
-                        adult_males.push_back(std::move(nests[current->nest_id].larval_males[index]));
+                        Individual<1> temp = std::move(nests[current->nest_id].larval_males[index]);
+                        adult_males.push_back(std::move(temp));
+                        // adult_males.emplace_back(std::move(nests[current->nest_id].larval_males[index]));
                         // nests[current->nest_id].larval_males.erase(nests[current->nest_id].larval_males.begin() + (-index));
                         // auto it = nests[current->nest_id].larval_males.begin() + index;
                         // remove_from_vec2(nests[current->nest_id].larval_males, it);    
@@ -227,16 +229,20 @@ void Population::simulate_tst() {
                             }
                             // TST
                             std::cout << nests[current->nest_id].adult_females.size() << std::endl;
-                            print(); 
-                            nests[current->nest_id].adult_females.push_back(std::move(nests[current->nest_id].larval_females[index]));
                             print();
+                            // Individual<2> temp = std::move(nests[current->nest_id].larval_females[index]);
+                            // nests[current->nest_id].adult_females.push_back(std::move(temp));
+                            // nests[current->nest_id].adult_females.emplace_back(std::move(nests[current->nest_id].larval_females[index]));
+                            Individual<2> tempCopy = nests[current->nest_id].larval_females[index];
+                            print();
+                            nests[current->nest_id].adult_females.push_back(tempCopy);
                             print();
                             std::cout << nests[current->nest_id].adult_females.size() << std::endl;
                             // ERROR BELOW!
                             // auto it = nests[current->nest_id].larval_females.begin() + index;
                             // remove_from_vec2(nests[current->nest_id].larval_females, it);
-                            // remove_from_vec(nests[current->nest_id].larval_females, index);
-                            nests[current->nest_id].larval_females.erase(nests[current->nest_id].larval_females.begin() + index);
+                            remove_from_vec(nests[current->nest_id].larval_females, index);
+                            // nests[current->nest_id].larval_females.erase(nests[current->nest_id].larval_females.begin() + index);
                             print();
                             std::cout << nests[current->nest_id].adult_females.size() << std::endl;
                             // TST

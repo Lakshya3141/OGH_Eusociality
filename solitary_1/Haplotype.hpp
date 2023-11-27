@@ -21,7 +21,9 @@ class Haplotype {
     // Haplotype(char s) {}
     // Haplotype() : genes_dispersal{initialise_genes_dispersal()}, genes_choice{initialise_genes_choice()} {}
     Haplotype() : genes_dispersal{dInitDispersal}, genes_choice{initialise_genes_choice()} {}
-
+    // Copy constructor
+    Haplotype(const Haplotype& other);
+    
     double genes_dispersal;
     std::array<double, 2> genes_choice;
     
@@ -40,6 +42,13 @@ double Haplotype::initialise_genes_dispersal() {
 std::array<double, 2> Haplotype::initialise_genes_choice() {
     std::array<double, 2> temp_genes = {dInitChoiceIntercept, dInitChoiceSlope};
     return temp_genes;
+}
+
+
+// Copy constructor definition
+Haplotype::Haplotype(const Haplotype& other) {
+    genes_dispersal = other.genes_dispersal;
+    genes_choice = other.genes_choice;
 }
 
 void Haplotype::mutate() {

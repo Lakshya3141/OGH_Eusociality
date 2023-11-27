@@ -33,7 +33,9 @@ public:
     Individual(const int id);
     Individual(const int id, const Individual<2>& mum);   // male and female?
     // Individual(const Individual<2>& mum);   // female
-
+    // Copy constructor
+    Individual(const Individual<Ploidy>& other);
+    
     Haplotype sperm;
     std::array<Haplotype, Ploidy> genome;           // genome of individual with 1 or 2 haplotypes
     // Individual<2>* mother;
@@ -121,6 +123,33 @@ Individual<2>::Individual (const int id, const Individual<2>& mum) {
     mom_id = mum.ind_id;
     calculate_phenotype();
 }
+
+// Copy constructor
+template <int Ploidy>
+Individual<Ploidy>::Individual(const Individual<Ploidy>& other) {
+    is_alive = other.is_alive;
+    is_larvae = other.is_larvae;
+    sperm = other.sperm;
+    genome = other.genome; // Assuming Haplotype has a copy constructor
+    t_death = other.t_death;
+    t_next = other.t_next;
+    t_birth = other.t_birth;
+    ind_id = other.ind_id;
+    mom_id = other.mom_id;
+    dad_id = other.dad_id;
+    nest_id = other.nest_id;
+    phenotype_dispersal = other.phenotype_dispersal;
+    phenotype_choice = other.phenotype_choice;
+    is_disperser = other.is_disperser;
+    is_foraging = other.is_foraging;
+    is_mated = other.is_mated;
+    body_size = other.body_size;
+    num_offspring = other.num_offspring;
+    num_fem_offspring = other.num_fem_offspring;
+    num_larva = other.num_larva;
+    num_female_larva = other.num_female_larva;
+}
+
 
 // mate function // works
 template <>
