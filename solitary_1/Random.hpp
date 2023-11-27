@@ -39,14 +39,16 @@ double logistic(T x, double intercept, double slope) {
     return 1 / (1 + exp(intercept + static_cast<double>(x) * slope));
 }
 
-// function that removes objects from a vector
+// function that removes objects from a vector  
 
 template <typename T = double>
 void remove_from_vec(std::vector<T>& v, const size_t idx) {
-    std::cout << "start of remove from vec" << std::endl;
-    if (auto back_idx = v.size()-1; idx != back_idx) v[idx] = std::move(v[back_idx]);
+    // std::cout << "start of remove from vec" << std::endl;
+    // if (auto back_idx = v.size()-1; idx != back_idx) v[idx] = std::move(v[back_idx]);
+    auto back_idx = v.size()-1;
+    if (idx != back_idx) v[idx] = std::move(v[back_idx]);
     v.pop_back();
-    std::cout << "end of remove from vec" << std::endl;
+    // std::cout << "end of remove from vec" << std::endl;
 }
 
 template <typename T = double>

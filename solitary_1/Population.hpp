@@ -23,6 +23,7 @@ struct track_time {
     track_time(Individual<2>* input) {
       ind = input;
       time = ind->t_next;
+      std::cout << "IndID: "<< ind->ind_id << std::endl;
     }
 };
 
@@ -84,7 +85,7 @@ int Population::calculateTotalAdultFemales() {
 void Population::printIndividualInfo(const Individual<2>& individual) {
     std::cout << "Individual ID: " << individual.ind_id << "\n";
     std::cout << "Nest ID: " << individual.nest_id << "\n";
-    std::cout << "Time of Death: " << std::fixed << std::setprecision(2) << individual.t_death << "\n";
+    std::cout << "TNext: " << std::fixed << std::setprecision(2) << individual.t_next << "\n";
 
     // Print genome values
     for (int i = 0; i < 2; ++i) {
@@ -126,7 +127,6 @@ void Population::simulate_tst() {
         if (event % 10000 == 0) {
             removeDeadMales();
         }
-
         // Get the individual with the earliest next action time
         track_time next_event = event_queue.top();
         // std::cout << "Prepop Qlen: " << event_queue.size() << std::endl; // TST
@@ -134,7 +134,7 @@ void Population::simulate_tst() {
         // std::cout << "Pospop Qlen: " << event_queue.size() << std::endl; // TST
         auto current = next_event.ind;
         // TST // 
-        std::cout << "E: " << event << " | Ind: " << current->ind_id << " | Nid: " << current->nest_id << " | GT: " << gtime 
+        std::cout << "\nE: " << event << " | Ind: " << current->ind_id << " | Nid: " << current->nest_id << " | GT: " << gtime 
         << " | tn_bef: " << current->t_next <<  " | Alive_before: " << (current->is_alive ? "YES" : "NO ") 
         << " | Task_bef: " << (current->is_foraging ? "FOR":"REP") << " | Qlen: " << event_queue.size() << std::endl;
         // current->is_alive = false; // TST
@@ -143,9 +143,10 @@ void Population::simulate_tst() {
 
         // Last task survival check
         if (current->is_alive) { 
-            
+            // std::cout << "ALIVE" << std::endl;
             // TST Larval part shifted to the end
             if (current->is_foraging) {
+                // std::cout << "FORAGING" << std::endl;
                 int index = nests[current->nest_id].feed(dForagingMean, dForagingSD);
                 if (index < 0) {
                     index = -index - 1;
@@ -153,20 +154,17 @@ void Population::simulate_tst() {
                     // edit index setting here
                     if (nests[current->nest_id].larval_males[index].check_mature(gtime)) {
                         // TST
+                        // std::cout << "MALE Mat" << std::endl;
                         int old_lmales = nests[current->nest_id].larval_males.size();
                         int old_amales = adult_males.size();
-                        Individual<1> temp = std::move(nests[current->nest_id].larval_males[index]);
-                        adult_males.push_back(std::move(temp));
-                        // adult_males.emplace_back(std::move(nests[current->nest_id].larval_males[index]));
-                        // nests[current->nest_id].larval_males.erase(nests[current->nest_id].larval_males.begin() + (-index));
-                        // auto it = nests[current->nest_id].larval_males.begin() + index;
-                        // remove_from_vec2(nests[current->nest_id].larval_males, it);    
-                        // remove_from_vec(nests[current->nest_id].larval_males, index);
-                        nests[current->nest_id].larval_males.erase(nests[current->nest_id].larval_males.begin() + index);
+                        Individual<1> temp = nests[current->nest_id].larval_males[index];
+                        adult_males.push_back(temp);
+                        remove_from_vec(nests[current->nest_id].larval_males, index);
+                        // nests[current->nest_id].larval_males.erase(nests[current->nest_id].larval_males.begin() + index);
                         std::cout << "FOR Male index: " << index << " BSize: "<< nests[current->nest_id].larval_males[index].body_size 
                         << " MATURED Adult from " << old_amales << " to " << adult_males.size() 
                         << " Larvae From " << old_lmales << " to " << nests[current->nest_id].larval_males.size() << std::endl;
-                    } 
+                    }
                     // TST
                     else {
                         std::cout << "FOR Male index: " << index << " BSize: " << nests[current->nest_id].larval_males[index].body_size << " No Mature " << std::endl;
@@ -179,9 +177,9 @@ void Population::simulate_tst() {
                         // Need to check for task since check_task moved to nest level
                         // VIMP NEED TO CHANGE PLACEMENT OF THIS SO AS TO MAKE SURE TASK CHECK
                         // FOR DISPERSER DOESNT WORK ON MATURING NEST
-                        nests[current->nest_id].task_check(nests[current->nest_id].larval_females[index]);
+                        nests[current->nest_id].task_check(nests[current->nest_id].larval_females[index]); // LCIMP gotta change position
                         // TST MAJOR
-                        // nests[current->nest_id].larval_females[index].phenotype_dispersal = 0.0;
+                        nests[current->nest_id].larval_females[index].phenotype_dispersal = 0.0;
                         // TST 
                         // std::cout << nests[current->nest_id].larval_females[index].phenotype_dispersal << std::endl;
                         if (nests[current->nest_id].larval_females[index].check_disperser()) {
@@ -191,33 +189,37 @@ void Population::simulate_tst() {
                             }
                             int empty = update_emptyNests();
                             if (empty > 0) {
+                                // std::cout << "FEMALE Disp Mat" << std::endl;
                                 --empty;
                                 // TST
                                 int confirm_empty = nests[empty].adult_females.size();
-                                nests[empty].adult_females = {std::move(nests[current->nest_id].larval_females[index])};
-                                // auto it = nests[current->nest_id].larval_females.begin() + index;
-                                // remove_from_vec2(nests[current->nest_id].larval_females, it);
-                                nests[current->nest_id].larval_females.erase(nests[current->nest_id].larval_females.begin() + index);
-                                //remove_from_vec(nests[current->nest_id].larval_females, index);
+
+                                Individual<2> tempCopy = nests[current->nest_id].larval_females[index];
+                                nests[current->nest_id].adult_females[0].t_next = gtime;
+                                nests[current->nest_id].task_check(nests[current->nest_id].adult_females[0]);
+                                nests[empty].adult_females.push_back(tempCopy);
+
+                                remove_from_vec(nests[current->nest_id].larval_females, index);
                                 current->nest_id = empty; // Change nest ID too
+                                // event_queue.push(track_time(&nests[empty].adult_females[0])); // add matured to queue
                                 // TST
+                                
                                 std::cout << "1FOR Female index: " << index << " BSize: " << nests[current->nest_id].larval_females[index].body_size 
                                 << " MATURED DISPERSER Nest From " << current->nest_id << " to " << empty 
                                 << " NewAFem size from " << confirm_empty << " to " << nests[empty].adult_females.size() <<std::endl;
                             }
                             // TST
                             else {
+                                // std::cout << "FEMALE Disp Die" << std::endl;
                                 int old_lfemales = nests[current->nest_id].larval_females.size();
+                                remove_from_vec(nests[current->nest_id].larval_females, index);
+
                                 std::cout << "2FOR Female index: " << index << " BSize: " << nests[current->nest_id].larval_females[index].body_size 
                                 << " MATURED DISPERSER Died From " << current->nest_id << " LFemales From " 
                                 << old_lfemales << " to " << nests[current->nest_id].larval_females.size() << std::endl;
-                                // auto it = nests[current->nest_id].larval_females.begin() + index;
-                                // remove_from_vec2(nests[current->nest_id].larval_females, it);
-                                //remove_from_vec(nests[current->nest_id].larval_females, index);
-                                nests[current->nest_id].larval_females.erase(nests[current->nest_id].larval_females.begin() + index);
                             }
                         } else {
-                            std::cout << "MAT NO DISP" << std::endl;
+                            // std::cout << "FEMALE Mat" << std::endl;
                             // TST
                             int old_lfemales = nests[current->nest_id].larval_females.size();
                             int old_afemales = nests[current->nest_id].adult_females.size();
@@ -227,25 +229,14 @@ void Population::simulate_tst() {
                             if (!mated) {
                                 continue; //LC3 :: remove this  
                             }
-                            // TST
-                            std::cout << nests[current->nest_id].adult_females.size() << std::endl;
-                            print();
-                            // Individual<2> temp = std::move(nests[current->nest_id].larval_females[index]);
-                            // nests[current->nest_id].adult_females.push_back(std::move(temp));
-                            // nests[current->nest_id].adult_females.emplace_back(std::move(nests[current->nest_id].larval_females[index]));
-                            Individual<2> tempCopy = nests[current->nest_id].larval_females[index];
-                            print();
-                            nests[current->nest_id].adult_females.push_back(tempCopy);
-                            print();
-                            std::cout << nests[current->nest_id].adult_females.size() << std::endl;
-                            // ERROR BELOW!
-                            // auto it = nests[current->nest_id].larval_females.begin() + index;
-                            // remove_from_vec2(nests[current->nest_id].larval_females, it);
+                            // Individual<2> tempCopy = nests[current->nest_id].larval_females[index];
+                            nests[current->nest_id].adult_females.push_back(nests[current->nest_id].larval_females[index]);
+                            nests[current->nest_id].adult_females[old_afemales].t_next = gtime;
+                            nests[current->nest_id].task_check(nests[current->nest_id].adult_females[old_afemales]);
+                            // printIndividualInfo(nests[current->nest_id].adult_females[old_afemales]);
                             remove_from_vec(nests[current->nest_id].larval_females, index);
-                            // nests[current->nest_id].larval_females.erase(nests[current->nest_id].larval_females.begin() + index);
-                            print();
-                            std::cout << nests[current->nest_id].adult_females.size() << std::endl;
-                            // TST
+                            
+                            event_queue.push(track_time(&nests[current->nest_id].adult_females[old_afemales])); // add matured to queue
                             std::cout << "3FOR Female index: " << index << " BSize: " << old_bodysize 
                                 << " MATURED Afems from " << old_afemales << " to " << nests[current->nest_id].adult_females.size() 
                                 << " Larval fems from " << old_lfemales << " to " << nests[current->nest_id].larval_females.size() <<std::endl;
@@ -258,6 +249,7 @@ void Population::simulate_tst() {
                     else std::cout << "4FOR Female index: " << index << " BSize: " << nests[current->nest_id].larval_females[index].body_size << " NO Mature" << std::endl;
                 }
             } else {
+                // std::cout << "REPRODUCING" << std::endl;
                 int num_lmale = nests[current->nest_id].larval_males.size(); // TST
                 int num_lfemale = nests[current->nest_id].larval_females.size(); // TST
                 int sex = nests[current->nest_id].reproduce(*current);
@@ -275,39 +267,12 @@ void Population::simulate_tst() {
             nests[current->nest_id].task_check(*current);
             current->survival();
 
-            // HERE TST //
-            // std::cout << "Queue: [ ";
-            // std::priority_queue<track_time, std::vector<track_time>, decltype(cmptime)> temp_queue(event_queue);
-            // while (!temp_queue.empty()) {
-            //     track_time temp_event = temp_queue.top();
-            //     temp_queue.pop();
-            //     std::cout << "(" << temp_event.ind->ind_id << ", " << temp_event.time << ")";
-            //     if (!temp_queue.empty()) {
-            //         std::cout << ", ";
-            //     }
-            // }
-            // std::cout << " ]\n\n";
-
-            // Reinsert the individual into the event queue with the new next action time
             event_queue.push(track_time(current));
 
-            // printIndividualInfo(*current); // TST
-
-            // HERE TST //
-            // std::cout << "Queue: [ ";
-            // std::priority_queue<track_time, std::vector<track_time>, decltype(cmptime)> temp_queue1(event_queue);
-            // while (!temp_queue1.empty()) {
-            //     track_time temp_event = temp_queue1.top();
-            //     temp_queue1.pop();
-            //     std::cout << "(" << temp_event.ind->ind_id << ", " << temp_event.time << ")";
-            //     if (!temp_queue1.empty()) {
-            //         std::cout << ", ";
-            //     }
-            // }
-            // std::cout << " ]\n\n";
         
         } // Death condition 
         else {
+            // std::cout << "DEAD" << std::endl;
             // Find the position of the current individual in its nest's adult_females vector
             size_t ind = nests[current->nest_id].findFemaleIndexById(current->ind_id);
             // std::cout << "INDEX: " << ind << std::endl; // TST

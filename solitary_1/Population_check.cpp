@@ -26,7 +26,6 @@ void printIndividualDetails(const Individual<Ploidy>& individual) {
     std::cout << std::endl;
 }
 
-#include <iostream>
 #include <iomanip> // For std::setprecision
 #include <sstream> // For std::ostringstream
 
@@ -55,7 +54,7 @@ void printIndividualInfo(const Individual<2>& individual) {
 int main() {
     Population myPop;
 
-    std::cout << "1) INITIALISING POPULATION:  \n" << std::endl;
+    std::cout << "\n\n 1) INITIALISING POPULATION:  \n" << std::endl;
     // 1) Checking intialise pop
     myPop.initialise_pop();
     // printIndividualDetails(myPop.adult_males[0]);

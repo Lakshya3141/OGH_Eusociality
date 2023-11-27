@@ -132,6 +132,7 @@ Individual<Ploidy>::Individual(const Individual<Ploidy>& other) {
     sperm = other.sperm;
     genome = other.genome; // Assuming Haplotype has a copy constructor
     t_death = other.t_death;
+    // t_next = gtime + (current.is_foraging ? dForagingTime : dBroodingTime);
     t_next = other.t_next;
     t_birth = other.t_birth;
     ind_id = other.ind_id;
