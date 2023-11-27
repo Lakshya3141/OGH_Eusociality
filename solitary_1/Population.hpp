@@ -236,7 +236,7 @@ void Population::simulate_tst() {
                             // printIndividualInfo(nests[current->nest_id].adult_females[old_afemales]);
                             remove_from_vec(nests[current->nest_id].larval_females, index);
                             
-                            event_queue.push(track_time(&nests[current->nest_id].adult_females[old_afemales])); // add matured to queue
+                            // event_queue.push(track_time(&nests[current->nest_id].adult_females[old_afemales])); // add matured to queue
                             std::cout << "3FOR Female index: " << index << " BSize: " << old_bodysize 
                                 << " MATURED Afems from " << old_afemales << " to " << nests[current->nest_id].adult_females.size() 
                                 << " Larval fems from " << old_lfemales << " to " << nests[current->nest_id].larval_females.size() <<std::endl;
