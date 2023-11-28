@@ -250,7 +250,7 @@ void Population::simulate_tst() {
                                 std::cout << "check 6" << std::endl;
                                 // Individual<2> tempCopy = nests[current->nest_id].larval_females[index];
                                 std::cout << "size before push_back" << nests[nind].larval_females.size() << std::endl;
-                                nests[current->nest_id].adult_females.push_back(nests[nind].larval_females[std::get<2>(index)]);
+                                nests[nind].adult_females.push_back(nests[nind].larval_females[std::get<2>(index)]);
                                 std::cout << "size after push_back" << nests[nind].larval_females.size() << std::endl;
                                 
                                 std::cout << "check 7" << std::endl;
