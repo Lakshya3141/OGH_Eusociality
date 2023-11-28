@@ -9,7 +9,6 @@
 #define Nest_hpp    
 
 #include "Individual.hpp"
-//#include "Random.hpp" //JK: here too
 #include <algorithm>
 #include <cmath>
 #include <tuple>
@@ -19,28 +18,20 @@ public:
     Nest(const Individual<2>& f, const int nid) ;
     std::tuple<bool, bool, size_t> feed(const double& mean, const double& SD); // first bool refers to whether there are any larvae; second bool to whether a female = true or male = false was fed; size_t is larval index
     void reproduce(Individual<2>& female, const int id);
-    //bool is_empty();
     void task_check(Individual<2>& current);
     size_t findFemaleIndexById(unsigned long int id);
-    // temp vector to hold male adults and then move them to population level, delete the one at nest level
 
     int nest_id;
     std::vector<Individual<2> > adult_females;          // vector of adult females, [0] = breeder
-    // std::vector<Individual<1> > tmp_males;              // temporary vector for adult males
     std::vector<Individual<2> > larval_females;         // vector to store larval females
     std::vector<Individual<1> > larval_males;           // vector to store larval males
-
-    //int num_breeders;
 };
 
 
-// returns integer. If 0, no larvae fed. If positive, |index| - 1 is position of female larva
-// If negative, |index| - 1 is position of male larva
-//LC1: Need to decide what to do in the alternate case of no larvae
 std::tuple<bool, bool, size_t> Nest::feed(const double& mean, const double& SD) {
-    std::cout << "number larvae " << larval_males.size() + larval_females.size() << std::endl;
-    std::cout << "number male larvae " << larval_males.size() << std::endl;
-    std::cout << "number female larvae " << larval_females.size() << std::endl;
+    std::cout << "f# larvae: " << larval_males.size() + larval_females.size()
+    << " | f# male larvae: " << larval_males.size()
+    << " | f# female larvae: " << larval_females.size() << std::endl; // TST DELETE
     if ((larval_males.size() + larval_females.size()) > 0){ // weighted probabilities
         double maleProbability = static_cast<double>(larval_males.size()) / (larval_males.size() + larval_females.size());
         double resources = normal(mean, SD);
@@ -74,18 +65,9 @@ void Nest::reproduce(Individual<2>& female, const int id) {
     }
 }
 
-/*bool Nest::is_empty(){
-    if (adult_females.size() == 0){
-        return true;
-    }
-    else return false;
-}*/
-
 
 void Nest::task_check(Individual<2>& current){
-    // LCI: Comfirm these
     current.is_foraging = bernoulli(logistic(larval_females.size() + larval_males.size(), current.phenotype_choice[0], current.phenotype_choice[1]));
-    // current.t_prev = current.t_next;
     current.t_next = current.t_next + (current.is_foraging ? dForagingTime : dBroodingTime);
 }
 

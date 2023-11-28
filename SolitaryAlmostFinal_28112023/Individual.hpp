@@ -10,18 +10,11 @@
 #define Individual_hpp
 
 #include "Haplotype.hpp"
-//#include "Random.hpp" //JK: doesn't need to be included again
 #include <iostream>
 
 using diploid_genome = std::array<Haplotype, 2>;
 using haploid_genome = std::array<Haplotype, 1>;
 using sperm_genomes = std::vector<haploid_genome>; // YEP IS UNUSED YET
-
-enum class Task {
-    foraging,
-    brooding,
-    death
-};
 
 template <int Ploidy>
 class Individual {
@@ -30,9 +23,6 @@ public:
     // Individual constructors
     Individual(const int id);
     Individual(const int id, const Individual<2>& mum);   // male and female?
-    // Individual(const Individual<2>& mum);   // female
-    // Copy constructor
-    //Individual(const Individual<Ploidy>& other); //JK: I would not define a copy constructor
     
     Haplotype sperm;
     std::array<Haplotype, Ploidy> genome;           // genome of individual with 1 or 2 haplotypes
@@ -103,7 +93,7 @@ Individual<1>::Individual (const int id, const Individual<2>& mum) {
     mutate(); // individual is created then mutates
     ind_id = id;
     mom_id = mum.ind_id;
-    std::cout << "mum.ind_id " << mum.ind_id << std::endl;
+    std::cout << "mum.ind_id " << mum.ind_id << std::endl; // TST DELETE
 }
 
 // constructor for females (diploid)
@@ -116,7 +106,7 @@ Individual<2>::Individual (const int id, const Individual<2>& mum) {
     for(int i = 0; i < 2; ++i) {
         genome[1].genes_choice[i] = mum.genome[bernoulli()].genes_choice[i];
     }
-    std::cout << "mum.ind_id " << mum.ind_id << std::endl;
+    std::cout << "mum.ind_id " << mum.ind_id << std::endl; // TST DELETE
     nest_id = mum.nest_id;
     is_larvae = true;
     mutate();
@@ -124,33 +114,6 @@ Individual<2>::Individual (const int id, const Individual<2>& mum) {
     mom_id = mum.ind_id;
     calculate_phenotype();
 }
-
-// Copy constructor
-/*template <int Ploidy>
-Individual<Ploidy>::Individual(const Individual<Ploidy>& other) {
-    is_alive = other.is_alive;
-    is_larvae = other.is_larvae;
-    sperm = other.sperm;
-    genome = other.genome; // Assuming Haplotype has a copy constructor
-    t_death = other.t_death;
-    // t_next = gtime + (current.is_foraging ? dForagingTime : dBroodingTime);
-    t_next = other.t_next;
-    t_birth = other.t_birth;
-    ind_id = other.ind_id;
-    mom_id = other.mom_id;
-    dad_id = other.dad_id;
-    nest_id = other.nest_id;
-    phenotype_dispersal = other.phenotype_dispersal;
-    phenotype_choice = other.phenotype_choice;
-    is_disperser = other.is_disperser;
-    is_foraging = other.is_foraging;
-    is_mated = other.is_mated;
-    body_size = other.body_size;
-    num_offspring = other.num_offspring;
-    num_fem_offspring = other.num_fem_offspring;
-    num_larva = other.num_larva;
-    num_female_larva = other.num_female_larva;
-}*/
 
 
 // mate function // works
@@ -180,6 +143,8 @@ void Individual<2>::survival(){
     }
 }
 
+// Inverse transform sampling
+// https://en.wikipedia.org/wiki/Inverse_transform_sampling
 template <> 
 bool Individual<1>::check_mature(double& birth_time){
     if (bernoulli(logistic(body_size, dLarvaIntercept, dLarvaSlope))) {
@@ -191,8 +156,6 @@ bool Individual<1>::check_mature(double& birth_time){
     else return false;
 }
 
-// LC: Inverse transform sampling
-// https://en.wikipedia.org/wiki/Inverse_transform_sampling
 template <> 
 bool Individual<2>::check_mature(double& birth_time){
     if (bernoulli(logistic(body_size, dLarvaIntercept, dLarvaSlope))) {
@@ -205,8 +168,6 @@ bool Individual<2>::check_mature(double& birth_time){
 
 template <>
 bool Individual<2>::check_disperser(){
-
-    // LCIMP
     if (phenotype_dispersal < 0) {
         phenotype_dispersal = 0.0;
     }

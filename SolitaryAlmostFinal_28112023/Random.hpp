@@ -14,6 +14,7 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
+#include <string>
 
 unsigned int simulationID = static_cast<unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count()); // sample a seed
 std::mt19937 rn(simulationID); // seed the random number generator
@@ -71,6 +72,14 @@ void remove_from_vec2(std::vector<T>& v, typename std::vector<T>::iterator it) {
 
 void print(){
     std::cout << "DUMMY" << std::endl;
+}
+
+void print_spec(const std::string& str){
+    std::cout << str << std::endl;
+}
+
+void print_spec(const char* str) {
+    std::cout << str << std::endl;
 }
 
 template <typename T>

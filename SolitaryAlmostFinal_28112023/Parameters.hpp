@@ -23,6 +23,7 @@ double dLambdaBrooding = 1.0;       // Poisson's constant for brooding
 double dDeathTime = 2.0;
 double gtime = 0.0;                 // Global time
 double dMaleLambda = 10.0;          // Average lifespan of male
+int check_dead_males = 1000.0;      // Every check_dead_males the dead males are removed
 
 //int IndID = 0;
 
