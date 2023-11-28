@@ -43,7 +43,8 @@ double logistic(T x, double intercept, double slope) {
 // function that removes objects from a vector
 template <typename T = double>
 void remove_from_vec(std::vector<T>& v, const size_t idx) {
-    if (auto back_idx = v.size()-1; idx != back_idx) v[idx] = std::move(v[back_idx]);
+    auto back_idx = v.size()-1;
+    if (idx != back_idx) v[idx] = std::move(v[back_idx]);
     v.pop_back();
 }
 
