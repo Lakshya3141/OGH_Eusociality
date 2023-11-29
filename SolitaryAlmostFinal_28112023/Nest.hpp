@@ -43,7 +43,7 @@ std::tuple<bool, bool, size_t> Nest::feed(const double& mean, const double& SD) 
             return std::make_tuple(true, false, ind);
         } else {
             size_t ind = uni_int(0, larval_females.size());
-            std::cout << "ind " << ind << std::endl;
+            std::cout << "vector ind " << ind << std::endl;
             std::cout << "larval_females.size() " << larval_females.size() << std::endl;
             larval_females[ind].body_size += resources;
             return std::make_tuple(true, true, ind);
@@ -56,15 +56,30 @@ Nest::Nest(const Individual<2>& f, const int nid) : nest_id(nid) {
     adult_females.push_back(f);
 } // Constructor for nest
 
+// TST
+// produces males if not mated or with bernoulli(male sex ratio)
+// void Nest::reproduce(Individual<2>& female, const int id) {
+//     if (bernoulli(const_sex_ratio) || !female.is_mated) {
+//         larval_males.emplace_back(id, female);
+//     } else {
+//         larval_females.emplace_back(id, female);
+//     }
+// }
+
+// TST
 // produces males if not mated or with bernoulli(male sex ratio)
 void Nest::reproduce(Individual<2>& female, const int id) {
-    if (bernoulli(const_sex_ratio) || !female.is_mated) {
-        larval_males.emplace_back(id, female);
+    if (female.is_mated) {
+        if (bernoulli(const_sex_ratio)) {
+            larval_males.emplace_back(id, female);
+        } else {
+            larval_females.emplace_back(id, female);
+        }
     } else {
-        larval_females.emplace_back(id, female);
+        larval_males.emplace_back(id, female);
+        std::cout << "only male cause female is unmated" << std::endl; // TST DELETE
     }
 }
-
 
 void Nest::task_check(Individual<2>& current){
     current.is_foraging = bernoulli(logistic(larval_females.size() + larval_males.size(), current.phenotype_choice[0], current.phenotype_choice[1]));

@@ -12,7 +12,7 @@
 double dInitDispersal = 0.0;        // Initial value of the dispersal gene
 // Logistic expression looks like 1/(1+exp(a+b*x))
 double dLarvaIntercept = 5.0;       // value of parameter a in larval hatching logistic expression
-double dLarvaSlope = -5.0;           // value of parameter a in larval hatching logistic expression
+double dLarvaSlope = -5.0;           // value of parameter b in larval hatching logistic expression
 double dInitChoiceIntercept = 0.0;  // Initial value of parameter a in task choice logistic expression
 double dInitChoiceSlope = 0.0;      // Initial value of parameter b in task choice logistic expression
 
@@ -32,10 +32,10 @@ double dMutBias = 0.0;              // Mutation Bias
 double dMutEffect = 0.02;           // Mutation effect
 double dSurvForage = 1.0;             // Survival probability at each time step for all bees
 double dSurvBrood = 1.0;
-double dForagingMean = 1.0;         // Mean of normal foraging curve
-double dForagingSD = 0.3;           // SD of normal foraging curve
+double dForagingMean = 1.5;         // Mean of normal foraging curve
+double dForagingSD = 0.5;           // SD of normal foraging curve
 double dMaturingSize = 1.0;         // Maturing size of larvae
 unsigned int max_nests = 5;      // Maximum number of nests
-double const_sex_ratio = 0.1;       // male sex ratio
-int max_events = 20000;             // max number of events to go through
+double const_sex_ratio = 0.0;       // male sex ratio
+int max_events = 2000;             // max number of events to go through
 #endif /* Parameters_hpp */

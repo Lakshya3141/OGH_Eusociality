@@ -34,7 +34,7 @@ public:
     bool is_alive = true;
     bool is_larvae = false;                         // needs to be before constructor definition //JK: it also seems to work when defined below
     double t_death;
-    double t_next = uni_real();                     // Impart an asynchronous start if need be
+    double t_next;                     // Impart an asynchronous start if need be
     double t_birth;
     int ind_id;
     unsigned long int mom_id;   // Mother ID
@@ -151,6 +151,7 @@ bool Individual<1>::check_mature(double& birth_time){
         is_larvae = false;
         t_birth = birth_time;
         t_death = birth_time + ( - log(1 - uni_real()) / dMaleLambda );
+        std::cout << "t_death decided: " << t_death << " at birth time: " << birth_time << std::endl; // TST DELETE
         return true;
     }
     else return false;
