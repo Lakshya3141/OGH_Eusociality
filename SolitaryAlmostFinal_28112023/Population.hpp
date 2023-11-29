@@ -172,9 +172,11 @@ void Population::simulate_tst() {
                                 std::cout << "nest id " << current->nest_id << std::endl;
                                 std::cout << "ind id " << current->ind_id << std::endl;
                                 std::cout << "check 6" << std::endl;
-                                std::cout << "size before push_back " << nests[cnind].larval_females.size() << std::endl;
+                                std::cout << "size adult before push_back " << nests[cnind].adult_females.size() << std::endl;
+                                std::cout << "size larval before push_back " << nests[cnind].larval_females.size() << std::endl;
                                 nests[cnind].adult_females.push_back(nests[cnind].larval_females[std::get<2>(index)]);
-                                std::cout << "size after push_back " << nests[cnind].larval_females.size() << std::endl;
+                                std::cout << "size adult after push_back " << nests[cnind].adult_females.size() << std::endl;
+                                std::cout << "size larval after push_back " << nests[cnind].larval_females.size() << std::endl;
                                 
                                 std::cout << "check 7" << std::endl;
                                 std::cout << "nest id " << current->nest_id << std::endl;
@@ -182,6 +184,7 @@ void Population::simulate_tst() {
                                 std::cout << "larval_female size before erase " << nests[cnind].larval_females.size() << std::endl;
                                 std::cout << "larval position " << std::get<2>(index) << std::endl;
                                 nests[cnind].larval_females.erase(nests[cnind].larval_females.begin() + std::get<2>(index));
+                                std::cout << "larval_female size after erase " << nests[cnind].larval_females.size() << std::endl;
                                 
                                 nests[cnind].adult_females[old_afemales].t_next = gtime;
                                 nests[cnind].task_check(nests[cnind].adult_females[old_afemales]);
