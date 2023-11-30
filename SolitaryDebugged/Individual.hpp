@@ -53,9 +53,7 @@ public:
     bool is_mated = false;
     
     double body_size = 0.0;     // body size, primarily used for larvae
-    int num_offspring = 0;      // number of offspring a foundress will produce
-    int num_fem_offspring = 0;  // number of female offspring a foundress will produce
-    int num_larva = 0;
+    int num_larva = 0; 
     int num_female_larva = 0;
 };
 

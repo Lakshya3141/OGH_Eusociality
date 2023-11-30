@@ -100,10 +100,8 @@ int main() {
     myPop.adult_males.clear();
     Individual<2> dumFemale(myPop.individual_id_counter);
     ++myPop.individual_id_counter;
-    std::cout << "When no males, mate returns: " << myPop.mate(dumFemale) << std::endl;
     // printIndividualInfo(dumFemale);
     myPop.adult_males = dumMalesVector;
-    std::cout << "When males, mate returns: " << myPop.mate(dumFemale) << std::endl;
     // printIndividualInfo(dumFemale);
 
     // 4) Checking update_emptynests

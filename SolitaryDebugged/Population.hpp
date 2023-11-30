@@ -37,7 +37,7 @@ public:
     void initialise_pop();
     int choose_RndmMale();
     int update_emptyNests();
-    bool mate(Individual<2>& female);
+    void mate(Individual<2>& female);
     void removeDeadMales();
 
     //  TST  //
@@ -87,9 +87,9 @@ void Population::simulate_tst() {
         << " | tn_bef: " << next_event.time <<  " | Alive_before: " << (current.is_alive ? "YES" : "NO ") 
         << " | Task_bef: " << (current.is_foraging ? "FOR":"REP") << " | Qlen: " << event_queue.size() << std::endl;
 
-        std::cout << "Dispersal: " << current.phenotype_dispersal
-        << " Choice Int: " << current.phenotype_choice[0]
-        << " Choice Slope: " << current.phenotype_choice[1] << std::endl;
+        // std::cout << "Dispersal: " << current.phenotype_dispersal
+        // << " Choice Int: " << current.phenotype_choice[0]
+        // << " Choice Slope: " << current.phenotype_choice[1] << std::endl;
 
         gtime = current.t_next;
 
@@ -116,7 +116,7 @@ void Population::simulate_tst() {
                     } else { // if female
                         if (nests[cnestid].larval_females[std::get<2>(index)].check_mature(gtime)) {
                             if (nests[cnestid].larval_females[std::get<2>(index)].check_disperser()) {
-                                bool mated = mate(nests[cnestid].larval_females[std::get<2>(index)]); // TST MODIFY mated function maybe
+                                mate(nests[cnestid].larval_females[std::get<2>(index)]); // TST MODIFY mated function maybe
                                 int empty = update_emptyNests();
                                 if (empty > 0) {
                                     --empty;
@@ -146,7 +146,7 @@ void Population::simulate_tst() {
                                 size_t old_afemales = nests[cnestid].adult_females.size();
                                 // TST
                                 double old_bodysize = nests[cnestid].larval_females[std::get<2>(index)].body_size;
-                                bool mated = mate(nests[cnestid].larval_females[std::get<2>(index)]);
+                                mate(nests[cnestid].larval_females[std::get<2>(index)]);
 
                                 nests[cnestid].adult_females.push_back(nests[cnestid].larval_females[std::get<2>(index)]);
                                 nests[cnestid].larval_females.erase(nests[cnestid].larval_females.begin() + std::get<2>(index));
@@ -216,15 +216,11 @@ int Population::choose_RndmMale(){
 }
 
 // returns true if female finds mate
-bool Population::mate(Individual<2>& female){
+void Population::mate(Individual<2>& female){
     int index = choose_RndmMale();
     // std::cout << "Male index chosen: " << index - 1 << std::endl; // TST
     if (index){
         female.mate(adult_males[index - 1]);
-        return true;
-    }
-    else {
-        return false;
     }
 }
 

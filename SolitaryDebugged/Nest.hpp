@@ -59,10 +59,12 @@ void Nest::reproduce(Individual<2>& female, const int id) {
             larval_males.emplace_back(id, female);
         } else {
             larval_females.emplace_back(id, female);
+            female.num_female_larva++;
         }
     } else {
         larval_males.emplace_back(id, female);
     }
+    female.num_larva++;
 }
 
 void Nest::task_check(Individual<2>& current){
