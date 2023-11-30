@@ -69,7 +69,7 @@ void Nest::reproduce(Individual<2>& female, const int id) {
 
 void Nest::task_check(Individual<2>& current){
     current.is_foraging = bernoulli(logistic(larval_females.size() + larval_males.size(), current.phenotype_choice[0], current.phenotype_choice[1]));
-    current.t_next = current.t_next + (current.is_foraging ? dForagingTime : dBroodingTime);
+    current.t_next = current.t_next + (current.is_foraging ? dForagingTime : dBroodingTime) + uni_real();
 }
 
 // Function to search by indidivual ID and return index + 1
