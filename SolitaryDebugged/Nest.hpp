@@ -57,15 +57,12 @@ void Nest::reproduce(Individual<2>& female, const int id) {
     if (female.is_mated) {
         if (bernoulli(const_sex_ratio)) {
             larval_males.emplace_back(id, female);
-            std::cout << "Male born" << std::endl;
         } else {
             larval_females.emplace_back(id, female);
-            std::cout << "Female born" << std::endl;
             female.num_female_larva++;
         }
     } else {
         larval_males.emplace_back(id, female);
-            std::cout << "Male born" << std::endl;
     }
     female.num_larva++;
 }

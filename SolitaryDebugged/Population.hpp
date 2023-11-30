@@ -132,10 +132,6 @@ void Population::simulate_tst() {
         << " | tn_bef: " << next_event.time <<  " | Alive_before: " << (current.is_alive ? "YES" : "NO ") 
         << " | Task_bef: " << (current.is_foraging ? "FOR":"REP") << " | Qlen: " << event_queue.size() << std::endl;
 
-        std::cout << "Dispersal: " << current.phenotype_dispersal
-        << " Choice Int: " << current.phenotype_choice[0]
-        << " Choice Slope: " << current.phenotype_choice[1] << std::endl;
-
         gtime = current.t_next;
 
         // Last task survival check
@@ -177,7 +173,6 @@ void Population::simulate_tst() {
                                     std::cout << "1FOR Female index: " << std::get<2>(index) << " BSize: " << nests[empty].adult_females[0].body_size
                                     << " MATURED DISPERSER Nest From " << current.nest_id << " to " << empty
                                     << " NewAFem size from " << confirm_empty << " to " << nests[empty].adult_females.size() <<std::endl;
-                                    printIndividualDetails(nests[empty].adult_females[0]);
                                 } else {
                                     size_t old_lfemales = nests[cnestid].larval_females.size();
                                     double old_lbodyzize = nests[cnestid].larval_females[std::get<2>(index)].body_size;
@@ -204,7 +199,6 @@ void Population::simulate_tst() {
                                 std::cout << "3FOR Female index: " << std::get<2>(index) << " BSize: " << old_bodysize
                                 << " MATURED Afems from " << old_afemales << " to " << nests[cnestid].adult_females.size()
                                 << " Larval fems from " << old_lfemales << " to " << nests[cnestid].larval_females.size() <<std::endl;  
-                                printIndividualDetails(nests[cnestid].adult_females[old_afemales]);
                             }
                         }
                         // TST DELETE
