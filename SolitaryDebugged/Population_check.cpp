@@ -1,55 +1,9 @@
 #include <iostream>
 #include "Population.hpp"
 
-template<int Ploidy>
-void printIndividualDetails(const Individual<Ploidy>& individual) {
-    std::cout << "Individual ID: " << individual.ind_id << " | Nest ID: " << individual.nest_id << std::endl;
-    std::cout << "Genome Values: ";
-    for (int i = 0; i < Ploidy; ++i) {
-        std::cout << "(" << individual.genome[i].genes_dispersal << ", " << individual.genome[i].genes_choice[0] << ", " << individual.genome[i].genes_choice[1] << ") ";
-    }
-    std::cout << std::endl;
-    std::cout << "Phenotype Dispersal: " << individual.phenotype_dispersal << std::endl;
-    std::cout << "Phenotype Choice Intercept: " << individual.phenotype_choice[0] << std::endl;
-    std::cout << "Phenotype Choice Slope: " << individual.phenotype_choice[1] << std::endl;
-    std::cout << "Is Alive: " << (individual.is_alive ? "true" : "false") << std::endl;
-    std::cout << "Is Larvae: " << (individual.is_larvae ? "true" : "false") << std::endl;
-    std::cout << "Is Foraging: " << (individual.is_foraging ? "true" : "false") << std::endl;
-    std::cout << "Is Disperser: " << (individual.is_disperser ? "true" : "false") << std::endl;
-    std::cout << "Is Mated: " << (individual.is_mated ? "true" : "false") << std::endl;
-    std::cout << "Body Size: " << individual.body_size << std::endl;
-    std::cout << "t_death: " << individual.t_death << std::endl;
-    // std::cout << "Number of Offspring: " << individual.num_offspring << std::endl;
-    // std::cout << "Number of Female Offspring: " << individual.num_fem_offspring << std::endl;
-    // std::cout << "Number of Larvae: " << individual.num_larva << std::endl;
-    // std::cout << "Number of Female Larvae: " << individual.num_female_larva << std::endl;
-    std::cout << std::endl;
-}
-
 #include <iomanip> // For std::setprecision
 #include <sstream> // For std::ostringstream
 
-// Function to print individual information concisely
-void printIndividualInfo(const Individual<2>& individual) {
-    std::cout << "Individual ID: " << individual.ind_id << "\n";
-    std::cout << "Nest ID: " << individual.nest_id << "\n";
-    std::cout << "Time of Death: " << std::fixed << std::setprecision(2) << individual.t_death << "\n";
-
-    // Print genome values
-    for (int i = 0; i < 2; ++i) {
-        const auto& haplotype = individual.genome[i];
-        std::cout << "Haplotype " << i + 1 << " Genome: (" << haplotype.genes_dispersal << ", "
-                  << haplotype.genes_choice[0] << ", " << haplotype.genes_choice[1] << ")\n";
-    }
-
-    // Print sperm gene values if mated
-    if (individual.is_mated) {
-        const auto& sperm = individual.sperm;
-        std::cout << "Sperm Genome: (" << sperm.genes_dispersal << ", " << sperm.genes_choice[0] << ", "
-                  << sperm.genes_choice[1] << ")\n";
-    }
-    std::cout << "\n" << std::endl;
-}
 
 int main() {
     Population myPop;
@@ -116,13 +70,20 @@ int main() {
 
     // 5) Checking population simluate
     std::cout << "4) SIMULATE  \n" << std::endl;
-
     std::cout << std::fixed;
     std::cout << std::setprecision(2);
 
     myPop = dumPop;
     gtime = 0.010001;
-    myPop.simulate_tst();
+    // myPop.simulate_tst();
+
+    // 6) Checking new population initalise and simulate
+    
+    std::cout << "5) INITIALISE AND SIMULATE  \n" << std::endl;
+
+    Population newPop;
+    newPop.initialise_pop();
+    newPop.simulate_tst();
 
     return 0;
 }

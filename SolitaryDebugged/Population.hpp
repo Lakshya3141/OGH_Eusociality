@@ -14,6 +14,53 @@
 #include <iomanip> // For std::setprecision
 #include <sstream> // For std::ostringstream
 
+template<int Ploidy>
+void printIndividualDetails(const Individual<Ploidy>& individual) {
+    std::cout << "Individual ID: " << individual.ind_id << " | Nest ID: " << individual.nest_id << std::endl;
+    std::cout << "Genome Values: ";
+    for (int i = 0; i < Ploidy; ++i) {
+        std::cout << "(" << individual.genome[i].genes_dispersal << ", " << individual.genome[i].genes_choice[0] << ", " << individual.genome[i].genes_choice[1] << ") ";
+    }
+    std::cout << std::endl;
+    std::cout << "Phenotype Dispersal: " << individual.phenotype_dispersal << std::endl;
+    std::cout << "Phenotype Choice Intercept: " << individual.phenotype_choice[0] << std::endl;
+    std::cout << "Phenotype Choice Slope: " << individual.phenotype_choice[1] << std::endl;
+    std::cout << "Is Alive: " << (individual.is_alive ? "true" : "false") << std::endl;
+    std::cout << "Is Larvae: " << (individual.is_larvae ? "true" : "false") << std::endl;
+    std::cout << "Is Foraging: " << (individual.is_foraging ? "true" : "false") << std::endl;
+    std::cout << "Is Disperser: " << (individual.is_disperser ? "true" : "false") << std::endl;
+    std::cout << "Is Mated: " << (individual.is_mated ? "true" : "false") << std::endl;
+    std::cout << "Body Size: " << individual.body_size << std::endl;
+    std::cout << "t_death: " << individual.t_death << std::endl;
+    // std::cout << "Number of Offspring: " << individual.num_offspring << std::endl;
+    // std::cout << "Number of Female Offspring: " << individual.num_fem_offspring << std::endl;
+    // std::cout << "Number of Larvae: " << individual.num_larva << std::endl;
+    // std::cout << "Number of Female Larvae: " << individual.num_female_larva << std::endl;
+    std::cout << std::endl;
+}
+
+// Function to print individual information concisely
+void printIndividualInfo(const Individual<2>& individual) {
+    std::cout << "Individual ID: " << individual.ind_id << "\n";
+    std::cout << "Nest ID: " << individual.nest_id << "\n";
+    std::cout << "Time of Death: " << std::fixed << std::setprecision(2) << individual.t_death << "\n";
+
+    // Print genome values
+    for (int i = 0; i < 2; ++i) {
+        const auto& haplotype = individual.genome[i];
+        std::cout << "Haplotype " << i + 1 << " Genome: (" << haplotype.genes_dispersal << ", "
+                  << haplotype.genes_choice[0] << ", " << haplotype.genes_choice[1] << ")\n";
+    }
+
+    // Print sperm gene values if mated
+    if (individual.is_mated) {
+        const auto& sperm = individual.sperm;
+        std::cout << "Sperm Genome: (" << sperm.genes_dispersal << ", " << sperm.genes_choice[0] << ", "
+                  << sperm.genes_choice[1] << ")\n";
+    }
+    std::cout << "\n" << std::endl;
+}
+
 // track_time struct
 struct track_time {
     float time;
@@ -40,7 +87,6 @@ public:
     void mate(Individual<2>& female);
     void removeDeadMales();
 
-    //  TST  //
     void simulate_tst(); 
     int calculateTotalAdultFemales();
     void printIndividualInfo(const Individual<2>& individual);
@@ -53,7 +99,6 @@ public:
 
 auto cmptime = [](const track_time& a, const track_time& b) { return a.time > b.time; };
 
-// TST
 void Population::simulate_tst() {
     // Create a priority queue to track individuals by their next action time
     std::priority_queue<track_time, std::vector<track_time>, decltype(cmptime)> event_queue(cmptime);
@@ -87,9 +132,9 @@ void Population::simulate_tst() {
         << " | tn_bef: " << next_event.time <<  " | Alive_before: " << (current.is_alive ? "YES" : "NO ") 
         << " | Task_bef: " << (current.is_foraging ? "FOR":"REP") << " | Qlen: " << event_queue.size() << std::endl;
 
-        // std::cout << "Dispersal: " << current.phenotype_dispersal
-        // << " Choice Int: " << current.phenotype_choice[0]
-        // << " Choice Slope: " << current.phenotype_choice[1] << std::endl;
+        std::cout << "Dispersal: " << current.phenotype_dispersal
+        << " Choice Int: " << current.phenotype_choice[0]
+        << " Choice Slope: " << current.phenotype_choice[1] << std::endl;
 
         gtime = current.t_next;
 
@@ -116,7 +161,7 @@ void Population::simulate_tst() {
                     } else { // if female
                         if (nests[cnestid].larval_females[std::get<2>(index)].check_mature(gtime)) {
                             if (nests[cnestid].larval_females[std::get<2>(index)].check_disperser()) {
-                                mate(nests[cnestid].larval_females[std::get<2>(index)]); // TST MODIFY mated function maybe
+                                mate(nests[cnestid].larval_females[std::get<2>(index)]);
                                 int empty = update_emptyNests();
                                 if (empty > 0) {
                                     --empty;
@@ -132,7 +177,8 @@ void Population::simulate_tst() {
                                     std::cout << "1FOR Female index: " << std::get<2>(index) << " BSize: " << nests[empty].adult_females[0].body_size
                                     << " MATURED DISPERSER Nest From " << current.nest_id << " to " << empty
                                     << " NewAFem size from " << confirm_empty << " to " << nests[empty].adult_females.size() <<std::endl;
-                                } else { // TST DELETE a bunch
+                                    printIndividualDetails(nests[empty].adult_females[0]);
+                                } else {
                                     size_t old_lfemales = nests[cnestid].larval_females.size();
                                     double old_lbodyzize = nests[cnestid].larval_females[std::get<2>(index)].body_size;
                                     nests[cnestid].larval_females.erase(nests[cnestid].larval_females.begin() + std::get<2>(index));
@@ -144,7 +190,7 @@ void Population::simulate_tst() {
                             } else {
                                 size_t old_lfemales = nests[cnestid].larval_females.size();
                                 size_t old_afemales = nests[cnestid].adult_females.size();
-                                // TST
+
                                 double old_bodysize = nests[cnestid].larval_females[std::get<2>(index)].body_size;
                                 mate(nests[cnestid].larval_females[std::get<2>(index)]);
 
@@ -154,10 +200,11 @@ void Population::simulate_tst() {
                                 nests[cnestid].adult_females[old_afemales].t_next = gtime;
                                 nests[cnestid].task_check(nests[cnestid].adult_females[old_afemales]);
                                 
-                                event_queue.push(track_time(nests[cnestid].adult_females[old_afemales])); // TST UNCOMMENT add matured to queue
+                                event_queue.push(track_time(nests[cnestid].adult_females[old_afemales]));
                                 std::cout << "3FOR Female index: " << std::get<2>(index) << " BSize: " << old_bodysize
                                 << " MATURED Afems from " << old_afemales << " to " << nests[cnestid].adult_females.size()
                                 << " Larval fems from " << old_lfemales << " to " << nests[cnestid].larval_females.size() <<std::endl;  
+                                printIndividualDetails(nests[cnestid].adult_females[old_afemales]);
                             }
                         }
                         // TST DELETE
@@ -185,12 +232,6 @@ void Population::simulate_tst() {
             nests[cnestid].adult_females.erase(nests[cnestid].adult_females.begin() + current_index);
             
         }
-
-        // TST //
-        // std::cout << "     | Ind: " << current.ind_id << " | Nid: " << current.nest_id << " | GT: " << gtime 
-        // << " | tn_now: " << current.t_next <<  " | Alive_now: " << (current.is_alive ? "YES" : "NO ") 
-        // << " | Task_now: " << (current.is_foraging ? "FOR":"REP") << " | Qlen: " << event_queue.size() << std::endl;
-        // std::cout << "Adult Len Females: " << calculateTotalAdultFemales() << std::endl; // TST
     }
 }
 
@@ -218,7 +259,6 @@ int Population::choose_RndmMale(){
 // returns true if female finds mate
 void Population::mate(Individual<2>& female){
     int index = choose_RndmMale();
-    // std::cout << "Male index chosen: " << index - 1 << std::endl; // TST
     if (index){
         female.mate(adult_males[index - 1]);
     }
@@ -232,7 +272,6 @@ int Population::update_emptyNests() {
             empty_nests.push_back(i);
         }
     }
-    // printVector(empty_nests); // TST
     if (empty_nests.empty()) {
         return 0; // No empty nests found
     } else {
@@ -252,22 +291,21 @@ void Population::removeDeadMales() {
 // initialise population function
 void Population::initialise_pop() {
     // population founders (using default constructor, which calls default constructor of Haplotype)
-    
+    adult_males.clear();
+    nests.clear();
+    empty_nests.clear();
     Individual<1> adam(individual_id_counter);
     ++individual_id_counter;
     adult_males.push_back(adam);
-    double cnt = 2.0; // TST DELETE
     
     for(int i=0; i < max_nests; ++i) {
         Individual<2> eve(individual_id_counter);
         ++individual_id_counter;
-        // eve.mate(adam); // TST UNCOMMENT
+        eve.mate(adam);
         eve.nest_id = nest_id_counter;
         eve.t_next = uni_real();
         eve.is_foraging = false;
         ++nest_id_counter;
-        eve.genome[0].genes_dispersal = cnt; //TST DELETE
-        cnt += 0.5; // TST DELETE
         nests.emplace_back(eve, eve.nest_id);
     }
 }
