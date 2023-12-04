@@ -17,12 +17,12 @@
 double gtime = 0.0;                 // Global time
 int check_dead_males = 1000.0;      // Every check_dead_males the dead males are removed
 const unsigned int max_nests = 5;      // Maximum number of nests
-int max_events = 20000;             // max number of events to go through
+int max_events = 2000;             // max number of events to go through
 
 double dInitDispersal = 0.2;        // Initial value of the dispersal gene
 // Logistic expression looks like 1/(1+exp(a+b*x))
 double dInitChoiceIntercept = 5.0;  // Initial value of parameter a in task choice logistic expression
-double dInitChoiceSlope = -1.0;      // Initial value of parameter b in task choice logistic expression
+double dInitChoiceSlope = -2.5;      // Initial value of parameter b in task choice logistic expression
 
 struct params {
 

@@ -104,7 +104,7 @@ int main(int argc, char* argv[]) {
         auto end = std::chrono::high_resolution_clock::now();
         auto diff = end - start2;
         std::cout << std::endl;
-        std::cout << " That took " << std::chrono::duration<double>(diff).count() << " seconds" << std::endl;
+        std::cout << "That took " << std::chrono::duration<double>(diff).count() << " seconds" << std::endl;
         
         return 0;
         

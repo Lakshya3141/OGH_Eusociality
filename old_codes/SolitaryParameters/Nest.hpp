@@ -43,7 +43,9 @@ std::tuple<bool, bool, size_t> Nest::feed(const double& mean, const double& SD) 
             return std::make_tuple(true, true, ind);
         }
     }
-    return std::make_tuple(false, true, 0);
+    else {
+        return std::make_tuple(false, true, 0);
+    }
 }
 
 Nest::Nest(const Individual<2>& f, const int nid) : nest_id(nid) {
