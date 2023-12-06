@@ -14,16 +14,15 @@
 #include <vector>
 #include <algorithm>
 
-double gtime = 0.0;                     // Global time
-double max_gtime_evolution = 100.0;     // 100000.0 
-double max_gtime_LastOfUs = 10.0;  // 500;              // Maximum for last of us generation
-int check_dead_males = 5000.0;          // Every check_dead_males the dead males are removed
-const unsigned int max_nests = 1000;    // Maximum number of nests
+double gtime = 0.0;                   // Global time
+int check_dead_males = 1000.0;        // Every check_dead_males the dead males are removed
+const unsigned int max_nests = 5;     // Maximum number of nests
+int max_events = 2000;                // max number of events to go through
 
-double dInitDispersal = -5.0;          // Initial value of the dispersal gene
+double dInitDispersal = 0.2;          // Initial value of the dispersal gene
 // Logistic expression looks like 1/(1+exp(a+b*x))
-double dInitChoiceIntercept = 0.0;    // Initial value of parameter a in task choice logistic expression
-double dInitChoiceSlope = 0.0;       // Initial value of parameter b in task choice logistic expression
+double dInitChoiceIntercept = 5.0;    // Initial value of parameter a in task choice logistic expression
+double dInitChoiceSlope = -2.5;       // Initial value of parameter b in task choice logistic expression
 
 struct params {
 
@@ -40,17 +39,17 @@ struct params {
     double dForagingTime = 3.0;         // Time it takes for foraging
     double dBroodingTime = 4.0;         // Time it takes for brooding
     double dDeathTime = 2.0;            // Time it takes for death
-    double dMaleLambda = 0.1;          // 1/Average lifespan of male
+    double dMaleLambda = 10.0;          // Average lifespan of male
 
-    double dMutRate = 0.01;              // Mutation probability
+    double dMutRate = 1.0;              // Mutation probability
     double dMutBias = 0.0;              // Mutation Bias
-    double dMutEffect = 0.06;           // Mutation effect
-
-    double dSurvForage = 0.98;           // Survival probability for foraging of all bees
-    double dSurvBrood = 0.99;            // Survival probability for reproduction of all bees
-    double dForagingMean = 0.5;         // Mean of normal foraging curve
-    double dForagingSD = 0.2;           // SD of normal foraging curve
-    double const_sex_ratio = 0.5;       // male sex ratio
+    double dMutEffect = 0.02;           // Mutation effect
+    double dSurvForage = 0.9;           // Survival probability for foraging of all bees
+    double dSurvBrood = 0.9;            // Survival probability for reproduction of all bees
+    double dForagingMean = 1.5;         // Mean of normal foraging curve
+    double dForagingSD = 0.5;           // SD of normal foraging curve
+    double dMaturingSize = 1.0;         // Maturing size of larvae
+    double const_sex_ratio = 0.1;       // male sex ratio
     
     std::string temp_params_to_record;
     std::vector < std::string > param_names_to_record;
@@ -72,6 +71,7 @@ struct params {
         dSurvBrood                    = from_config.getValueOfKey<double>("dSurvBrood");
         dForagingMean                 = from_config.getValueOfKey<double>("dForagingMean");
         dForagingSD                   = from_config.getValueOfKey<double>("dForagingSD");
+        dMaturingSize                 = from_config.getValueOfKey<double>("dMaturingSize");
         const_sex_ratio               = from_config.getValueOfKey<double>("const_sex_ratio");
         temp_params_to_record         = from_config.getValueOfKey<std::string>("params_to_record");
         param_names_to_record         = split(temp_params_to_record);
@@ -104,25 +104,25 @@ struct params {
     float get_val(std::string s) {
         if (s == "dLarvaIntercept")               return dLarvaIntercept;
         if (s == "dLarvaSlope")                   return dLarvaSlope;
-        
         if (s == "dForagingTime")                 return dForagingTime;
         if (s == "dBroodingTime")                 return dBroodingTime;
         if (s == "dDeathTime")                    return dDeathTime;
         if (s == "dMaleLambda")                   return dMaleLambda;
-
         if (s == "dMutRate")                      return dMutRate;
         if (s == "dMutBias")                      return dMutBias;
         if (s == "dMutEffect")                    return dMutEffect;
-
         if (s == "dSurvForage")                   return dSurvForage;
         if (s == "dSurvBrood")                    return dSurvBrood;
         if (s == "dForagingMean")                 return dForagingMean;
         if (s == "dForagingSD")                   return dForagingSD;
+        if (s == "dMaturingSize")                 return dMaturingSize;
         if (s == "const_sex_ratio")               return const_sex_ratio;
-        // ADD PARAMS TO RECORD
+        
         throw std::runtime_error("can not find parameter");
         return -1.f; // FAIL
     }
 };
+
+
 
 #endif /* Parameters_hpp */

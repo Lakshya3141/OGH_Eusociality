@@ -20,9 +20,7 @@ public:
     std::tuple<bool, bool, size_t> feed(const double& mean, const double& SD);
     void reproduce(Individual<2>& female, const int id, const params& p);
     void task_check(Individual<2>& current, const params& p);
-    size_t findFemaleIndexById(int id);
-    void mate_withinNest(Individual<2>& female);
-    std::tuple<bool, size_t> choose_RndmMaleLarva();
+    size_t findFemaleIndexById(unsigned int id);
 
     unsigned int nest_id;
     std::vector<Individual<2> > adult_females;          // vector of adult females, [0] = breeder
@@ -85,11 +83,11 @@ void Nest::reproduce(Individual<2>& female, const int id, const params& p) {
 void Nest::task_check(Individual<2>& current, const params& p) {
     current.is_foraging = bernoulli(logistic(larval_females.size() + larval_males.size(), current.phenotype_choice[0], current.phenotype_choice[1]));
     current.t_next = current.t_next + (current.is_foraging ? p.dForagingTime : p.dBroodingTime) + uni_real(); 
-    // Adding noise by adding uni_real();
+    // Adding noise by adding uni_real();    
 }
 
 // Function to search by indidivual ID in a nest and return index
-size_t Nest::findFemaleIndexById(int id) {
+size_t Nest::findFemaleIndexById(unsigned int id) {
     auto it = std::find_if(adult_females.begin(), adult_females.end(), [id](const Individual<2>& ind) {
         return ind.ind_id == id;
     });
@@ -102,24 +100,5 @@ size_t Nest::findFemaleIndexById(int id) {
     }
 }
 
-// Last of Us
-// Function for intial output experiment on last generation
-// Mates females with one of the larval males
-void Nest::mate_withinNest(Individual<2>& female) {
-    std::tuple<bool, size_t> index_tuple = choose_RndmMaleLarva();
-    if (std::get<0>(index_tuple)){
-        female.mate(larval_males[std::get<1>(index_tuple)]);
-    }
-}
-
-// Last of Us
-// returns index of selected random larval male
-std::tuple<bool, size_t> Nest::choose_RndmMaleLarva(){
-    if (larval_males.size() != 0) {
-        size_t index = uni_int(0, larval_males.size());
-        return std::make_tuple(true, index);
-    }
-    else return std::make_tuple(false, 0);
-}
 
 #endif /* Nest_hpp */

@@ -28,9 +28,9 @@ public:
     
     bool is_alive = true;
     bool is_larvae = false;
-    double t_death = -1.0;
+    double t_death;
     double t_next;                     
-    double t_birth = 0.0;
+    double t_birth;
     int ind_id;
     int mom_id = -1;            // Mother ID
     int dad_id = -1;            // Father ID
@@ -164,16 +164,5 @@ bool Individual<2>::check_disperser(){
     }
     return false;
 }
-
-// Function for LastOfUs output
-void printIndividualCSV(std::ostream& csv_file, const Individual<2>& current, const Individual<2>& recent, const unsigned long int event, const double gtime) {
-    csv_file << event << "," << gtime << "," << current.nest_id << "," << current.ind_id << ","
-              << current.mom_id << "," << current.dad_id << "," << current.is_mated << ","
-              << current.mate_id << "," << current.is_foraging << "," << recent.is_foraging << ","
-              << current.num_female_larva << "," << current.num_larva << "," << current.t_birth << ","
-              << current.is_alive << "," << current.t_death << "," << current.phenotype_dispersal << ","
-              << current.phenotype_choice[0] << "," << current.phenotype_choice[1] << std::endl;
-}
-
 
 #endif /* Individual_hpp */

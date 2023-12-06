@@ -70,8 +70,6 @@
         "xutility": "cpp",
         "list": "cpp",
         "unordered_map": "cpp",
-        "xhash": "cpp",
-        "numeric": "cpp"
-    },
-    "C_Cpp.errorSquiggles": "disabled"
+        "xhash": "cpp"
+    }
 }

@@ -15,7 +15,6 @@
 #include <cmath>
 #include <iostream>
 #include <string>
-#include <algorithm>
 
 unsigned int simulationID = static_cast<unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count()); // sample a seed
 std::mt19937 rn(simulationID); // seed the random number generator
@@ -35,11 +34,6 @@ double uni_real(double lower = 0.0, double upper = 1.0) { return std::uniform_re
 
 // binomial distribution
 int binom(int n, double p) { return std::binomial_distribution<int>(n,p)(rn); }
-
-// exponential distribution
-double exponential(double lambda) {
-    return std::exponential_distribution<double>(lambda)(rn);
-}
 
 // lpgistic function
 template <typename T>
@@ -81,43 +75,4 @@ void printVector(const std::vector<T>& vec) {
     std::cout << "]\n";
 }
 
-// Function to randomly select alpha number of individuals
-template <typename T>
-std::vector<T> randomSubset(const std::vector<T>& individuals, int alpha) {
-    if (alpha >= individuals.size()) {
-        // Return the entire vector if alpha is greater or equal to the vector size
-        return individuals;
-    }
-
-    // Copy the vector to avoid modifying the original vector
-    std::vector<T> result = individuals;
-
-    // Shuffle the vector to randomize the selection
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(result.begin(), result.end(), g);
-
-    // Resize the vector to contain only alpha elements
-    result.resize(alpha);
-
-    return result;
-}
-
-// Function to calculate the average of a vector of doubles
-double calculateAverage(const std::vector<double>& values) {
-    if (values.empty()) {
-        // Handle the case where the vector is empty to avoid division by zero
-        std::cerr << "Error: Cannot calculate average of an empty vector." << std::endl;
-        return 0.0; // You may choose to return a special value or throw an exception here
-    }
-
-    // Calculate the sum of all elements in the vector
-    double sum = 0.0;
-    for (const double& value : values) {
-        sum += value;
-    }
-
-    // Calculate the average
-    return sum / static_cast<double>(values.size());
-}
 #endif /* Random_hpp */
