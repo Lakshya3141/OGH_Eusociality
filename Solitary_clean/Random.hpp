@@ -46,6 +46,8 @@ template <typename T>
 double logistic(T x, double intercept = 0.0, double slope = 1.0) {
     return 1 / (1 + exp(intercept + static_cast<double>(x) * slope));
 }
+// LCIP: this could be confusing because a *positive* slope implies that
+// the function *decreases* with x!
 
 
 // function that removes objects from a vector
@@ -84,13 +86,17 @@ void printVector(const std::vector<T>& vec) {
 // Function to randomly select alpha number of individuals
 template <typename T>
 std::vector<T> randomSubset(const std::vector<T>& individuals, int alpha) {
-    if (alpha >= individuals.size()) {
-        // Return the entire vector if alpha is greater or equal to the vector size
-        return individuals;
-    }
-
     // Copy the vector to avoid modifying the original vector
     std::vector<T> result = individuals;
+
+    if (alpha >= individuals.size()) {
+        // Shuffle the entire vector if alpha is greater or equal to the vector size
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(result.begin(), result.end(), g);
+
+        return result;
+    }
 
     // Shuffle the vector to randomize the selection
     std::random_device rd;
@@ -102,6 +108,7 @@ std::vector<T> randomSubset(const std::vector<T>& individuals, int alpha) {
 
     return result;
 }
+
 
 // Function to calculate the average of a vector of doubles
 double calculateAverage(const std::vector<double>& values) {

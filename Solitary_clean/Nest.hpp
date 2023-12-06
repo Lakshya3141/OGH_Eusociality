@@ -20,9 +20,10 @@ public:
     std::tuple<bool, bool, size_t> feed(const double& mean, const double& SD);
     void reproduce(Individual<2>& female, const int id, const params& p);
     void task_check(Individual<2>& current, const params& p);
-    size_t findFemaleIndexById(int id);
+    size_t findFemaleIndexById(const int id);
     void mate_withinNest(Individual<2>& female);
     std::tuple<bool, size_t> choose_RndmMaleLarva();
+    void printIndividualCSV(std::ostream& csv_file, const Individual<2>& current, const Individual<2>& recent, const unsigned long int event, const double gtime);
 
     unsigned int nest_id;
     std::vector<Individual<2> > adult_females;          // vector of adult females, [0] = breeder
@@ -31,7 +32,8 @@ public:
 };
 
 // < is there any larvae fed, female == true, index of larvae fed > : Structure of tuple returned from feed function
-// 
+// LCIP: not clear (yet) what the returned index is needed for; guess we'll see!
+// -> Cause if the larva matures, we need to move it between vectors, and they are feeding them randomly
 std::tuple<bool, bool, size_t> Nest::feed(const double& mean, const double& SD) {
     // confirm presence of larvae
     if ((larval_males.size() + larval_females.size()) > 0){
@@ -62,6 +64,8 @@ std::tuple<bool, bool, size_t> Nest::feed(const double& mean, const double& SD) 
 Nest::Nest(const Individual<2>& f, const int nid) : nest_id(nid) {
     adult_females.push_back(f);
 } // Constructor for nest
+// IP: maybe let (a) constructor accept r-value female so it can be moved insetad of copied ...
+// LCIMP: I am confused what you mean by r-value female.
 
 
 // produces males if not mated or with bernoulli(male sex ratio)
@@ -82,16 +86,27 @@ void Nest::reproduce(Individual<2>& female, const int id, const params& p) {
 }
 
 // choose next task of individual based on logistic funtion and phenotype choice.
+// LCIP: why is this a member function of Nest instead of Individual?
+// Cause they need access to the larval female and male vector size, which are nest members
 void Nest::task_check(Individual<2>& current, const params& p) {
+
+    // LCIP: so foraging choice depends on nr of larvae according to logistic reaction norm -> YEP
     current.is_foraging = bernoulli(logistic(larval_females.size() + larval_males.size(), current.phenotype_choice[0], current.phenotype_choice[1]));
     current.t_next = current.t_next + (current.is_foraging ? p.dForagingTime : p.dBroodingTime) + uni_real(); 
     // Adding noise by adding uni_real();
+    // LCIP: why add noise here? -> To provide an asynchronous start
+    // Cause otherwise the larva from one parent are perfectly tied into their cycles (which may break)
 }
 
 // Function to search by indidivual ID in a nest and return index
-size_t Nest::findFemaleIndexById(int id) {
+// LCIP: I wonder what this is for ...
+// -> Since individuals die and swap, we dont know their index in the adult_females
+// Hence we gotta find that to delete/access them
+// LCIP: shouldn't the id argument be constant? -> Yep changed it
+size_t Nest::findFemaleIndexById(const int id) {
     auto it = std::find_if(adult_females.begin(), adult_females.end(), [id](const Individual<2>& ind) {
         return ind.ind_id == id;
+        // LCIP: ind.ind_id and id not same type -> I have made both unsigned ints now LCIMP
     });
 
     if (it != adult_females.end()) {
@@ -120,6 +135,17 @@ std::tuple<bool, size_t> Nest::choose_RndmMaleLarva(){
         return std::make_tuple(true, index);
     }
     else return std::make_tuple(false, 0);
+}
+
+// Function for LastOfUs output
+void Nest::printIndividualCSV(std::ostream& csv_file, const Individual<2>& current, const Individual<2>& recent, const unsigned long int event, const double gtime) {
+    csv_file << event << "," << gtime << "," << current.nest_id << "," << current.ind_id << ","
+              << current.mom_id << "," << current.dad_id << "," << current.is_mated << ","
+              << current.mate_id << "," << current.is_foraging << "," << recent.is_foraging << ","
+              << current.num_female_larva << "," << current.num_larva << "," << current.t_birth << ","
+              << current.is_alive << "," << current.t_death << "," << current.phenotype_dispersal << ","
+              << current.phenotype_choice[0] << "," << current.phenotype_choice[1] << "," << larval_females.size() << ","  
+              << larval_males.size() << "," << adult_females.size() << std::endl;
 }
 
 #endif /* Nest_hpp */

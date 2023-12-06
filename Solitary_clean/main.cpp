@@ -24,7 +24,6 @@ int main(int argc, char* argv[]) {
         Population myPop(sim_par_in);
         myPop.initialise_pop();
        
-        // std::cout << " SIMULATE  \n" << std::endl;
         std::cout << std::fixed;
         std::cout << std::setprecision(2);
         myPop.simulate_tst();
@@ -32,10 +31,23 @@ int main(int argc, char* argv[]) {
         auto end = std::chrono::high_resolution_clock::now();
         auto diff = end - start;
         std::cout << std::endl;
-        std::cout << "That took " << std::chrono::duration<double>(diff).count() << " seconds" << std::endl;
+        std::cout << "Initial population simulation took " << std::chrono::duration<double>(diff).count() << " seconds" << std::endl;
         
-        // Population lastGen = myPop.initialise_LastOfUs();
-        // lastGen.simulate_LastOfUs();
+        auto start2 = std::chrono::high_resolution_clock::now();
+        
+        Population lastGen = myPop.initialise_LastOfUs();
+        
+        std::cout << std::fixed;
+        std::cout << std::setprecision(2);
+        
+        lastGen.simulate_LastOfUs();
+
+        auto end2 = std::chrono::high_resolution_clock::now();
+        auto diff2 = end2 - start2;
+        std::cout << std::endl;
+        std::cout << "Last of Us simulation took " << std::chrono::duration<double>(diff2).count() << " seconds\n" << std::endl;
+        
+
         return 0;
         
     }

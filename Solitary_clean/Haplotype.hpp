@@ -15,10 +15,13 @@
 // initialiser lists are computtionally efficient compared to declaring body
 class Haplotype {
     public:
-    Haplotype() : genes_dispersal{dInitDispersal}, genes_choice{initialise_genes_choice()} {}
+    // Haplotype() : genes_dispersal{dInitDispersal}, genes_choice{initialise_genes_choice()} {}
+    Haplotype() : genes_dispersal{dInitDispersal}, genes_choice{{dInitChoiceIntercept, dInitChoiceSlope}} {}
     
     double genes_dispersal;
-    std::array<double, 2> genes_choice;
+    std::array<double, 2> genes_choice; // IP: why 2? choice of task?
+    // I see now: one is intercept, other slope. But wrt what?
+    // LCIP: It defines a logistic function
     
     std::array<double, 2> initialise_genes_choice();
     void mutate(const params& p);

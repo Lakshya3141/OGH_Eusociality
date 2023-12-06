@@ -27,7 +27,7 @@ public:
     std::array<Haplotype, Ploidy> genome;           // genome of individual with 1 or 2 haplotypes
     
     bool is_alive = true;
-    bool is_larvae = false;
+    bool is_larva = false;
     double t_death = -1.0;
     double t_next;                     
     double t_birth = 0.0;
@@ -46,7 +46,7 @@ public:
     
     double body_size = 0.0;     // body size, used for larvae
     int num_larva = 0; 
-    int num_female_larva = 0;
+    int num_female_larva = 0;   // LCIP This is to have the total number of males and females by each individual
 
     // Individual funcions
     void mate(const Individual<1>& male); 
@@ -79,7 +79,7 @@ Individual<2>::Individual (const int id) : ind_id(id) {
 
 // constructor for males (haploid)
 template <>
-Individual<1>::Individual (const int id, const Individual<2>& mum, const params& p) : is_larvae(true), ind_id(id), mom_id(mum.ind_id) {
+Individual<1>::Individual (const int id, const Individual<2>& mum, const params& p) : is_larva(true), ind_id(id), mom_id(mum.ind_id) {
     // son inherits genes from mum (with 50:50 chance of each haplotype)
     genome[0].genes_dispersal = mum.genome[bernoulli()].genes_dispersal;
     genome[0].genes_choice = mum.genome[bernoulli()].genes_choice;
@@ -88,10 +88,14 @@ Individual<1>::Individual (const int id, const Individual<2>& mum, const params&
 
 // constructor for females (diploid)
 template <>
-Individual<2>::Individual (const int id, const Individual<2>& mum, const params& p) : nest_id(mum.nest_id), is_larvae(true), ind_id(id), mom_id(mum.ind_id), dad_id(mum.mate_id) {
+Individual<2>::Individual (const int id, const Individual<2>& mum, const params& p) : nest_id(mum.nest_id), is_larva(true), ind_id(id), mom_id(mum.ind_id), dad_id(mum.mate_id) {
     // daughter inherits one haplotype from sperm stored with mum
+    // LCIP: first check if mom actally has sperm? We check if the female is mated when
+    // they reproduce, and if not they only produce males
     genome[0] = mum.sperm;
     genome[1].genes_dispersal = mum.genome[bernoulli()].genes_dispersal;
+
+    // LCIP: Yes, we have full recombination for slope and choice
     for(int i = 0; i < 2; ++i) {
         genome[1].genes_choice[i] = mum.genome[bernoulli()].genes_choice[i];
     }
@@ -104,7 +108,7 @@ Individual<2>::Individual (const int id, const Individual<2>& mum, const params&
 template <>
 void Individual<2>::mate(const Individual<1>& male) {
     sperm = male.genome[0]; // females store sperm from mate
-    // LC: What abour recombination?
+    // LCIP: What abour recombination? Oh yeah I just forgot to delete this comment
     mate_id = male.ind_id;
     is_mated = true;
 }
@@ -121,6 +125,9 @@ void Individual<Ploidy>::mutate(const params& p) {
 template <>
 void Individual<2>::survival(const params& p) {
     // If foraging and survives XOR reproducing and survives
+    // LCIP: why XOR? OR is faster because it doesn't evaluate the second expression if the first evaluates as TRUE
+    // Valid point, XOR is correct technically but since both expressions evaluating to true isnt an
+    // harmful condition, OR works better :)
     if ((is_foraging && !bernoulli(p.dSurvForage)) ^ (!is_foraging && !bernoulli(p.dSurvBrood))) {
         is_alive = false;
         t_death = gtime + p.dDeathTime;
@@ -132,10 +139,12 @@ void Individual<2>::survival(const params& p) {
 // Inverse transform sampling for an exponential distribution
 // to sample time of death
 // https://en.wikipedia.org/wiki/Inverse_transform_sampling
+// IP: there's a built-in std::exponential_distribution
 template <> 
 bool Individual<1>::check_mature(double& birth_time, const params& p) {
     if (bernoulli(logistic(body_size, p.dLarvaIntercept, p.dLarvaSlope))) {
-        is_larvae = false;
+        // LCIP: so the bigger the more likely to mature (seeing as slope=-5): Yep
+        is_larva = false;
         t_birth = birth_time;
         // inverse transform sampling
         t_death = birth_time + ( - log(1 - uni_real()) / p.dMaleLambda );
@@ -144,11 +153,17 @@ bool Individual<1>::check_mature(double& birth_time, const params& p) {
     return false;
 }
 
+// LCIP: why is maturation "stochastic"? LCIMP
+// Would it not be easier/faster/less noisy with a deterministic threshold size?
+// -> Yep I think you are right, but maybe this is closer to a more realistic scenario
+// and accounts for developmental noise? Although I am not sure how much that is relevant
+// to observing division of tasks, we could change this?
+
 // function to check maturity of female larvae after being fed
 template <> 
 bool Individual<2>::check_mature(double& birth_time, const params& p) {
     if (bernoulli(logistic(body_size, p.dLarvaIntercept, p.dLarvaSlope))) {
-        is_larvae = false;
+        is_larva = false;
         t_birth = birth_time;
         return true;
     }
@@ -163,16 +178,6 @@ bool Individual<2>::check_disperser(){
         return true;
     }
     return false;
-}
-
-// Function for LastOfUs output
-void printIndividualCSV(std::ostream& csv_file, const Individual<2>& current, const Individual<2>& recent, const unsigned long int event, const double gtime) {
-    csv_file << event << "," << gtime << "," << current.nest_id << "," << current.ind_id << ","
-              << current.mom_id << "," << current.dad_id << "," << current.is_mated << ","
-              << current.mate_id << "," << current.is_foraging << "," << recent.is_foraging << ","
-              << current.num_female_larva << "," << current.num_larva << "," << current.t_birth << ","
-              << current.is_alive << "," << current.t_death << "," << current.phenotype_dispersal << ","
-              << current.phenotype_choice[0] << "," << current.phenotype_choice[1] << std::endl;
 }
 
 

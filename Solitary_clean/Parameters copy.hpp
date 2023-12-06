@@ -16,7 +16,7 @@
 
 double gtime = 0.0;                     // Global time
 double max_gtime_evolution = 3000.0;     // 100000.0 
-double max_gtime_LastOfUs = 100.0;  // 500;              // Maximum for last of us generation
+double max_gtime_LastOfUs = 500.0;  // 500;              // Maximum for last of us generation
 int check_dead_males = 5000.0;          // Every check_dead_males the dead males are removed
 const unsigned int max_nests = 10;    // 1000 // Maximum number of nests
 
@@ -40,8 +40,6 @@ struct params {
     double dForagingTime = 3.0;         // Time it takes for foraging
     double dBroodingTime = 4.0;         // Time it takes for brooding
     double dDeathTime = 2.0;            // Time it takes for death
-    // LCIP: why does this take time? -> Cause they may die in the middle of their task
-    // so initially we wanted to keep this a uniform distribution maybe?
     double dMaleLambda = 0.1;          // 1/Average lifespan of male
 
     double dMutRate = 0.01;              // Mutation probability
