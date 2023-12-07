@@ -16,7 +16,7 @@
 
 // track_time struct for event queue ordered by next task time
 struct track_time {
-    float time;
+    double time;
     unsigned int nest_id;
     int ind_id;
 
@@ -260,7 +260,7 @@ void Population::simulate_tst() {
                                     // Push to adult females vector in empty nest and delete
                                     // from old larval vector
                                     new_nest.adult_females.push_back(f);
-                                    remove_from_vec(nests[cnestid].larval_females, std::get<2>(index))
+                                    remove_from_vec(nests[cnestid].larval_females, std::get<2>(index));
                                     // LCIP: why nor use remove_from_vec? -> Valid, changed
 
                                     // Since new colony, remove older larvae
@@ -282,7 +282,7 @@ void Population::simulate_tst() {
                                 } else {
                                     // If not disperser
                                     // erase larva
-                                    remove_from_vec(nests[cnestid].larval_females, std::get<2>(index))
+                                    remove_from_vec(nests[cnestid].larval_females, std::get<2>(index));
                                 }
                             } else { // else if not disperser
                                 
@@ -290,7 +290,7 @@ void Population::simulate_tst() {
 
                                 // Add to adult females and remove from larval females
                                 nests[cnestid].adult_females.push_back(f);
-                                remove_from_vec(nests[cnestid].larval_females, std::get<2>(index))
+                                remove_from_vec(nests[cnestid].larval_females, std::get<2>(index));
 
                                 // Update gtime and check task
                                 nests[cnestid].adult_females.back().t_next = gtime;
@@ -328,6 +328,7 @@ void Population::simulate_tst() {
     }
     csv_file.close();
 }
+
 
 // // Simulate just one generation as per output testing discussed
 Population Population::initialise_LastOfUs() {
@@ -487,7 +488,6 @@ void Population::simulate_LastOfUs(){
                             // Push mature larva to adult males vector
                             adult_males.push_back(m);
                             remove_from_vec(nests[cnestid].larval_males, std::get<2>(index));
-
                         }
                     } else { // if female
                         // Check mature
@@ -496,20 +496,15 @@ void Population::simulate_LastOfUs(){
                             // Check if disperser
                             if (f.check_disperser()) {
                                 // If disperser just remove it
-                                mate(f);
-                                // Get Empty nest ID and it's index in nests vector
-                                auto empty = update_emptyNests();
-                                size_t empty_index = findIndexByNestId(std::get<1>(empty));
-                                remove_from_vec(nests[cnestid].larval_females, std::get<2>(index));
+                                remove_from_vec(nests[cnestid].larval_females, std::get<2>(index));\
+
                             } else { // else if not disperser
                                 
-                                size_t old_afemales = nests[cnestid].adult_females.size();      // Old adult females sizes
                                 mate(f);        // Mate female on maturing
 
                                 // Add to adult females and remove from larval females
                                 nests[cnestid].adult_females.push_back(f);
-                                nests[cnestid].larval_females.erase(nests[cnestid].larval_females.begin() + std::get<2>(index));
-
+                                remove_from_vec(nests[cnestid].larval_females, std::get<2>(index));
                                 // Update gtime and check task
                                 nests[cnestid].adult_females.back().t_next = gtime;
                                 nests[cnestid].task_check(nests[cnestid].adult_females.back(), p);
@@ -533,8 +528,6 @@ void Population::simulate_LastOfUs(){
             // push current individual back to queue
             event_queue.push(track_time(nests[cnestid].adult_females[current_index]));
             recent = nests[cnestid].adult_females[current_index];
-            
-            // DO 
         
         } // Death condition 
         else {

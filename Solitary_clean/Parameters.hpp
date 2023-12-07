@@ -15,10 +15,10 @@
 #include <algorithm>
 
 double gtime = 0.0;                     // Global time
-double max_gtime_evolution = 3000.0;     // 100000.0 
-double max_gtime_LastOfUs = 100.0;  // 500;              // Maximum for last of us generation
-int check_dead_males = 5000.0;          // Every check_dead_males the dead males are removed
-const unsigned int max_nests = 10;    // 1000 // Maximum number of nests
+double max_gtime_evolution = 100000.0;     // 100000.0 
+double max_gtime_LastOfUs = 500.0;  // 500;              // Maximum for last of us generation
+int check_dead_males = 5000.0;          // Every check_dead_males events the dead males are removed
+const unsigned int max_nests = 1000;    // 1000 // Maximum number of nests
 
 double dInitDispersal = -5.0;          // Initial value of the dispersal gene
 // Logistic expression looks like 1/(1+exp(a+b*x))
