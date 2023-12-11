@@ -46,7 +46,7 @@ struct params {
 
     double dMutRate = 0.01;              // Mutation probability
     double dMutBias = 0.0;              // Mutation Bias
-    double dMutEffect = 0.06;           // Mutation effect
+    double dMutEffect = 0.12;           // Mutation effect
 
     double dSurvForage = 0.98;           // Survival probability for foraging of all bees
     double dSurvBrood = 0.99;            // Survival probability for reproduction of all bees

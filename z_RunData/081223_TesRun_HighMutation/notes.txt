@@ -1,0 +1,4 @@
+-> increased gevolution time from 100,000 to 1,00,000 and mutation stepsize from 0.06 to 0.12
+-> Also increased last_of_us time from 500 to 5000
+
+# Since last simulation took 126 seconds or so, I expect this one to be done under half an hour hopefully
