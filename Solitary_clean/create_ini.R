@@ -1,8 +1,7 @@
 options(scipen = 999)
 
 create_config <- function(config_file_name = "config.ini",
-                          dLarvaIntercept = 5.0,       
-                          dLarvaSlope = -5.0,
+                          dLarvaMatureSize = 1.0,
                           
                           dForagingTime = 3.0,
                           dBroodingTime = 4.0,
@@ -22,8 +21,7 @@ create_config <- function(config_file_name = "config.ini",
   
   newini <- list()
   newini[["params"]] <-
-    list("dLarvaIntercept" = dLarvaIntercept,
-         "dLarvaSlope" = dLarvaSlope,
+    list("dLarvaMatureSize" = dLarvaMatureSize,
          
          "dForagingTime" = dForagingTime,
          "dBroodingTime" = dBroodingTime,

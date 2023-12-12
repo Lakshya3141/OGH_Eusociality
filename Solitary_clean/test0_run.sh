@@ -14,3 +14,5 @@ Rscript create_ini.R
 g++ -std=c++2a -O2 Haplotype.hpp Random.hpp main.cpp Parameters.hpp Individual.hpp Population.hpp config_parser.h -o myprog
 chmod +x myprog
 ./myprog config.ini
+
+Rscript analysis_advanced.R

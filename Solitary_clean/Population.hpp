@@ -43,9 +43,10 @@ public:
     void removeDeadMales();                         // to remove dead males
     int findIndexByNestId(unsigned int nestId);     // returns index of Nest ID in nests vector
 
-    void simulate_tst();                            // simulate function
+    void simulate_tst(const std::string& output_filename);                            // simulate function
     Population initialise_LastOfUs();                       // initialise the last generation as per output testing discussed
-    void simulate_LastOfUs();
+    void simulate_LastOfUs(const std::string& output_filename);
+    void printPopulationState(std::ostream& csv_file, const unsigned long int event);  // add row of data to population state file
     
     unsigned int nest_id_counter = 0;               // nest ID counter 
     unsigned int individual_id_counter = 0;         // individual ID counter
@@ -53,20 +54,16 @@ public:
     // OUTPUT FUNCTIONS AND VARIABLES //
     // Function to export gene data to CSV
     params p;
+private:
+    double last_dead_male_removal_time = 0.0;
+    double last_output_time = 0.0;
 };
 
 auto cmptime = [](const track_time& a, const track_time& b) { return a.time > b.time; };
-// LCIP: but don't you want the individual with the smallest time? -> The way this is used with priority queues
-// we see exactly that
 
 // initialise population function
 void Population::initialise_pop() {
     // clear vectors
-    // LCIP: seems unnecessary at initialization -> Removed?
-    // adult_males.clear();
-    // nests.clear();
-    // empty_nests.clear();
-    // LCIMP: maybe reserve space here. Can save time. ??
 
     // starting with one adult male
     Individual<1> adam(individual_id_counter);
@@ -87,8 +84,7 @@ void Population::initialise_pop() {
         ++nest_id_counter;                      
         nests.emplace_back(eve, eve.nest_id);  
         // LCIP: could have moved eve since she is not re-used.
-        // -> Do you mean shift to the nest? Cause this way is based on intialiser lists
-        // and might be faster although I am not sure
+        // Decided not to in the end cause will have to do other calls then
     }
 }
 
@@ -104,7 +100,7 @@ int Population::findIndexByNestId(unsigned int nestId) {
     }
 
 // Simulate function for initalised population
-void Population::simulate_tst() {
+void Population::simulate_tst(const std::string& output_filename) {
     // Create a priority queue to track individuals by their next action time
     std::priority_queue<track_time, std::vector<track_time>, decltype(cmptime)> event_queue(cmptime);
     // Initialize the event queue with individuals and their initial next action times
@@ -114,10 +110,11 @@ void Population::simulate_tst() {
         }
     }
 
-    std::ofstream csv_file("output_evolution.csv");
-    csv_file << "gtime,event,choice_int_avg,choice_int_std,choice_slope_avg,choice_slope_std,dispersal_mean,dispersal_std" <<std::endl;
+    std::ofstream csv_file(output_filename);
+    csv_file << "gtime,event,choice_int_avg,choice_int_std,choice_slope_avg,choice_slope_std,dispersal_avg,dispersal_std,num_female,num_male,fem_avg,fem_std,femLarv_avg,femLarv_std,malLarv_avg,malLarv_std" <<std::endl;
 
     unsigned long int event = 0;
+
     // Simulate till max_gtime_evolution
     while (gtime < max_gtime_evolution) {
 
@@ -127,77 +124,11 @@ void Population::simulate_tst() {
             break;
         }
 
-        // remove dead males every check_dead_males events 
-        if (event % check_dead_males == 0) {
-            removeDeadMales();
-        }
+        // Call remove DeadMales every time 
+        removeDeadMales();
 
-        
         // output
-        if (event % 1000 == 0) {
-
-            // Output data to CSV
-            csv_file << gtime << "," << event;
-            
-            std::vector<double> dispersal_values;
-            std::vector<double> choiceInt_values;
-            std::vector<double> choiceSlope_values;
-            // Collect dispersal values for all females
-            for (auto& nest : nests) {
-                for (auto& female : nest.adult_females) {
-                    dispersal_values.push_back(female.phenotype_dispersal);
-                }
-            }
-
-            for (auto& nest : nests) {
-                for (auto& female : nest.adult_females) {
-                    choiceInt_values.push_back(female.phenotype_choice[0]);
-                }
-            }
-            
-            for (auto& nest : nests) {
-                for (auto& female : nest.adult_females) {
-                    choiceSlope_values.push_back(female.phenotype_choice[1]);
-                }
-            }
-
-            // Calculate mean and standard deviation for choice intercept
-            double mean = calculateAverage(choiceInt_values);
-            double std_dev = 0.0;
-            for (const auto& value : choiceInt_values) {
-                std_dev += std::pow(value - mean, 2);
-            }
-            std_dev = std::sqrt(std_dev / choiceInt_values.size());
-
-            // Output mean and standard deviation to CSV
-            csv_file << "," << mean << "," << std_dev;
-
-            // Calculate mean and standard deviation for choiceSlope
-            mean = std::accumulate(choiceSlope_values.begin(), choiceSlope_values.end(), 0.0) / choiceSlope_values.size();
-            std_dev = 0.0;
-            for (const auto& value : choiceSlope_values) {
-                std_dev += std::pow(value - mean, 2);
-            }
-            std_dev = std::sqrt(std_dev / choiceSlope_values.size());
-
-            // Output mean and standard deviation to CSV
-            csv_file << "," << mean << "," << std_dev;
-
-            // Calculate mean and standard deviation for dispersal
-            mean = std::accumulate(dispersal_values.begin(), dispersal_values.end(), 0.0) / dispersal_values.size();
-            std_dev = 0.0;
-            for (const auto& value : dispersal_values) {
-                std_dev += std::pow(value - mean, 2);
-            }
-            std_dev = std::sqrt(std_dev / dispersal_values.size());
-
-            // Output mean and standard deviation to CSV
-            csv_file << "," << mean << "," << std_dev;
-            
-
-            // End the CSV line
-            csv_file << "\n";
-        }
+        printPopulationState(csv_file, event);
 
         // Get the individual with the earliest next action time, pop it from queue
         // find nest index (cnestid) based on event's nest ID and individual ID (cindid)
@@ -210,9 +141,6 @@ void Population::simulate_tst() {
 
         // dummy current to hold old variable values for current individual
         auto current = nests[cnestid].adult_females[current_index];
-        // LCIP: why copy instead of reference? -> cause we use current to operate if statements
-        // while the actual location changes as per the tasks. I felt this could cause some issues,
-        // Hence the copy
 
         // Basic information
         // std::cout << "\nE: " << event << " | Ind: " << cindid << " | Nid: " << next_event.nest_id << " | GT: " << gtime 
@@ -261,7 +189,6 @@ void Population::simulate_tst() {
                                     // from old larval vector
                                     new_nest.adult_females.push_back(f);
                                     remove_from_vec(nests[cnestid].larval_females, std::get<2>(index));
-                                    // LCIP: why nor use remove_from_vec? -> Valid, changed
 
                                     // Since new colony, remove older larvae
                                     new_nest.larval_females.clear();
@@ -307,8 +234,6 @@ void Population::simulate_tst() {
                 // reproduce
                 nests[cnestid].reproduce(nests[cnestid].adult_females[current_index], individual_id_counter, p);
                 ++individual_id_counter;
-                // LCIP: why increase counter? Because a single offspring has been produced?
-                // -> Yeah this counter ensures every individual has a unique ID
             
             }
 
@@ -423,7 +348,7 @@ Population Population::initialise_LastOfUs() {
 }
 
 // Function to simulate the last generation until death of all colonies or a certain event time period
-void Population::simulate_LastOfUs(){
+void Population::simulate_LastOfUs(const std::string& output_filename){
     // Create a priority queue to track individuals by their next action time
     std::priority_queue<track_time, std::vector<track_time>, decltype(cmptime)> event_queue(cmptime);
 
@@ -433,7 +358,7 @@ void Population::simulate_LastOfUs(){
             event_queue.push(track_time(individual));
         }
     }
-    std::ofstream csv_file("output_LastOfUs.csv");
+    std::ofstream csv_file(output_filename);
     // TST add nest female size as well (larval vectors size also)
     csv_file << "event,gtime,nest_id,ind_id,mom_id,dad_id,is_mated,mate_id,current_foraging,next_foraging,num_female_larva,num_larva,t_birth,is_alive,t_death,dispersal,choice_int,choice_slope,num_femlarva,num_malelarva,num_adults"<<std::endl;
 
@@ -447,10 +372,8 @@ void Population::simulate_LastOfUs(){
             break;
         }
         
-        // remove dead males every check_dead_males events 
-        if (event % check_dead_males == 0) {
-            removeDeadMales();
-        }
+        // call remove DeadMales every time 
+        removeDeadMales();
 
         // Get the individual with the earliest next action time, pop it from queue
         // Find index of current indidvidual in it's respective next
@@ -535,7 +458,7 @@ void Population::simulate_LastOfUs(){
             nests[cnestid].adult_females.erase(nests[cnestid].adult_females.begin() + current_index);
         }
 
-        nests[current.nest_id].printIndividualCSV(csv_file, current, recent, event, gtime);
+        nests[current.nest_id].printIndividualEventCSV(csv_file, current, recent, event);
         event++;
     }
     csv_file.close();
@@ -557,8 +480,6 @@ void Population::mate(Individual<2>& female){
     if (std::get<0>(index_tuple)){
         female.mate(adult_males[std::get<1>(index_tuple)]);
     }
-    // LCIP: and what if there are no males? -> females produce only haploid males till one of them matures
-    // And then is available for fertilization
 }
 
 // updates empty nest list and returns tuple of the form < if_empty, ID >
@@ -581,12 +502,89 @@ std::tuple<bool, unsigned int> Population::update_emptyNests() {
 
 // function to remove dead males based on t_death compared to gtime
 void Population::removeDeadMales() {
+    // Check if enough time has passed since the last removal
+    if (gtime - last_dead_male_removal_time < dMaleRemovalTime) {
+        return; // Skip removal if not enough time has passed
+    }
+
     auto Condition = [](const Individual<1>& male) {
         return male.t_death <= gtime;
     };
     adult_males.erase(std::remove_if(adult_males.begin(), adult_males.end(), Condition), adult_males.end());
-    // How about incorporating erase_if here itself // ??
+
+    // Update the last removal time
+    last_dead_male_removal_time = gtime;
 }
+
+// function to print population state compared to gtime
+void Population::printPopulationState(std::ostream& csv_file, const unsigned long int event) {
+    // Check if enough time has passed since the last removal
+    if (gtime - last_output_time < dOutputTimeInterval) {
+        return; // Skip removal if not enough time has passed
+    }
+    // csv_file << "gtime,event,choice_int_avg,choice_int_std,choice_slope_avg,choice_slope_std,
+    // dispersal_avg,dispersal_std,num_female,num_male,fem_avg,fem_std,femLarv_avg,femLarv_std,malLarv_avg,malLarv_std" <<std::endl;
+
+    csv_file << gtime << "," << event;
+    
+    std::vector<double> dispersal_values;
+    std::vector<double> choiceInt_values;
+    std::vector<double> choiceSlope_values;
+    std::vector<int> fem_values;
+    std::vector<int> femLarv_values;
+    std::vector<int> malLarv_values;
+    int total_females = 0;
+    // Collect dispersal values for all females
+    for (auto& nest : nests) {
+        fem_values.push_back(nest.adult_females.size());
+        femLarv_values.push_back(nest.larval_females.size());
+        malLarv_values.push_back(nest.larval_males.size());
+        total_females += nest.adult_females.size();
+
+        for (auto& female : nest.adult_females) {
+            dispersal_values.push_back(female.phenotype_dispersal);
+            choiceInt_values.push_back(female.phenotype_choice[0]);
+            choiceSlope_values.push_back(female.phenotype_choice[1]);
+        }
+    }
+
+    // Calculate mean and standard deviation for choice intercept
+    std::tuple<double, double> stat;
+    stat = mean_std(choiceInt_values);
+    // Output mean and standard deviation to CSV
+    csv_file << "," << std::get<0>(stat) << "," << std::get<1>(stat);
+
+    stat = mean_std(choiceSlope_values);
+    // Output mean and standard deviation to CSV
+    csv_file << "," << std::get<0>(stat) << "," << std::get<1>(stat);
+
+    stat = mean_std(dispersal_values);
+    // Output mean and standard deviation to CSV
+    csv_file << "," << std::get<0>(stat) << "," << std::get<1>(stat);
+
+    // male and female size
+    csv_file << "," << total_females << "," << adult_males.size();
+
+    stat = mean_std(fem_values);
+    // Output mean and standard deviation to CSV
+    csv_file << "," << std::get<0>(stat) << "," << std::get<1>(stat);
+
+
+    stat = mean_std(femLarv_values);
+    // Output mean and standard deviation to CSV
+    csv_file << "," << std::get<0>(stat) << "," << std::get<1>(stat);
+
+    stat = mean_std(malLarv_values);
+    // Output mean and standard deviation to CSV
+    csv_file << "," << std::get<0>(stat) << "," << std::get<1>(stat);
+    
+    // End the CSV line
+    csv_file << "\n";
+    // Update the last removal time
+    last_output_time = gtime;
+
+}
+
 
 // Print individual details for debugging TST
 template<int Ploidy>

@@ -15,9 +15,10 @@
 #include <algorithm>
 
 double gtime = 0.0;                     // Global time
-double max_gtime_evolution = 100000.0;     // 100000.0 
-double max_gtime_LastOfUs = 500.0;  // 500;              // Maximum for last of us generation
-int check_dead_males = 5000.0;          // Every check_dead_males events the dead males are removed
+double max_gtime_evolution = 1000.0;     // 100000.0 
+double max_gtime_LastOfUs = 50.0;  // 500;              // Maximum for last of us generation
+double dMaleRemovalTime = 100.0;         // every time unit males are removed
+double dOutputTimeInterval = 10.0;      // population state output time interval
 const unsigned int max_nests = 1000;    // 1000 // Maximum number of nests
 
 double dInitDispersal = -5.0;          // Initial value of the dispersal gene
@@ -34,8 +35,7 @@ struct params {
     }
     
     // Below we will have some basic parameters to build the code
-    double dLarvaIntercept = 5.0;       // value of parameter a in larval hatching logistic expression
-    double dLarvaSlope = -5.0;          // value of parameter b in larval hatching logistic expression
+    double dLarvaMatureSize = 1.0;      // Hard maturation threshhold for bodysize 
 
     double dForagingTime = 3.0;         // Time it takes for foraging
     double dBroodingTime = 4.0;         // Time it takes for brooding
@@ -61,8 +61,7 @@ struct params {
     void read_parameters_from_ini(const std::string& file_name) {
         ConfigFile from_config(file_name);
 
-        dLarvaIntercept               = from_config.getValueOfKey<double>("dLarvaIntercept");
-        dLarvaSlope                   = from_config.getValueOfKey<double>("dLarvaSlope");
+        dLarvaMatureSize               = from_config.getValueOfKey<double>("dLarvaMatureSize");
         dForagingTime                 = from_config.getValueOfKey<double>("dForagingTime");
         dBroodingTime                 = from_config.getValueOfKey<double>("dBroodingTime");
         dDeathTime                    = from_config.getValueOfKey<double>("dDeathTime");
@@ -104,8 +103,7 @@ struct params {
     }
     
     float get_val(std::string s) {
-        if (s == "dLarvaIntercept")               return dLarvaIntercept;
-        if (s == "dLarvaSlope")                   return dLarvaSlope;
+        if (s == "dLarvaMatureSize")               return dLarvaMatureSize;
         
         if (s == "dForagingTime")                 return dForagingTime;
         if (s == "dBroodingTime")                 return dBroodingTime;

@@ -46,10 +46,11 @@ public:
     
     double body_size = 0.0;     // body size, used for larvae
     int num_larva = 0; 
-    int num_female_larva = 0;   // LCIP This is to have the total number of males and females by each individual
+    int num_female_larva = 0; 
+    int num_mates = 0;
 
     // Individual funcions
-    void mate(const Individual<1>& male); 
+    void mate(Individual<1>& male); 
     void mutate(const params& p);
     void calculate_phenotype();
     void survival(const params& p);
@@ -69,7 +70,7 @@ void Individual<2>::calculate_phenotype() {
 
 // default constructor male
 template <>
-Individual<1>::Individual (const int id) : ind_id(id), t_death(0.0) { }
+Individual<1>::Individual (const int id) : ind_id(id), t_death(-1.0) { }
 
 // default constructor female
 template <>
@@ -90,8 +91,6 @@ Individual<1>::Individual (const int id, const Individual<2>& mum, const params&
 template <>
 Individual<2>::Individual (const int id, const Individual<2>& mum, const params& p) : nest_id(mum.nest_id), is_larva(true), ind_id(id), mom_id(mum.ind_id), dad_id(mum.mate_id) {
     // daughter inherits one haplotype from sperm stored with mum
-    // LCIP: first check if mom actally has sperm? We check if the female is mated when
-    // they reproduce, and if not they only produce males
     genome[0] = mum.sperm;
     genome[1].genes_dispersal = mum.genome[bernoulli()].genes_dispersal;
 
@@ -106,11 +105,13 @@ Individual<2>::Individual (const int id, const Individual<2>& mum, const params&
 
 // mate function, stores the male haploid genome as sperm
 template <>
-void Individual<2>::mate(const Individual<1>& male) {
+void Individual<2>::mate(Individual<1>& male) {
     sperm = male.genome[0]; // females store sperm from mate
-    // LCIP: What abour recombination? Oh yeah I just forgot to delete this comment
     mate_id = male.ind_id;
     is_mated = true;
+    num_mates++;
+    male.is_mated = true;
+    male.num_mates++;
 }
 
 // mutate function // works
@@ -125,10 +126,7 @@ void Individual<Ploidy>::mutate(const params& p) {
 template <>
 void Individual<2>::survival(const params& p) {
     // If foraging and survives XOR reproducing and survives
-    // LCIP: why XOR? OR is faster because it doesn't evaluate the second expression if the first evaluates as TRUE
-    // Valid point, XOR is correct technically but since both expressions evaluating to true isnt an
-    // harmful condition, OR works better :)
-    if ((is_foraging && !bernoulli(p.dSurvForage)) ^ (!is_foraging && !bernoulli(p.dSurvBrood))) {
+    if ((is_foraging && !bernoulli(p.dSurvForage)) || (!is_foraging && !bernoulli(p.dSurvBrood))) {
         is_alive = false;
         t_death = gtime + p.dDeathTime;
         t_next = t_death;
@@ -136,35 +134,24 @@ void Individual<2>::survival(const params& p) {
 }
 
 // function to check maturity of male larvae after being fed
-// Inverse transform sampling for an exponential distribution
-// to sample time of death
-// https://en.wikipedia.org/wiki/Inverse_transform_sampling
-// IP: there's a built-in std::exponential_distribution
+// Also assigns death time to males
 template <> 
 bool Individual<1>::check_mature(double& birth_time, const params& p) {
-    if (bernoulli(logistic(body_size, p.dLarvaIntercept, p.dLarvaSlope))) {
-        // LCIP: so the bigger the more likely to mature (seeing as slope=-5): Yep
+    if (body_size > p.dLarvaMatureSize) {
         is_larva = false;
-        t_birth = birth_time;
-        // inverse transform sampling
-        t_death = birth_time + ( - log(1 - uni_real()) / p.dMaleLambda );
+        t_birth = birth_time + uni_real();
+        t_death = birth_time + exponential(p.dMaleLambda);
         return true;
     }
     return false;
 }
 
-// LCIP: why is maturation "stochastic"? LCIMP
-// Would it not be easier/faster/less noisy with a deterministic threshold size?
-// -> Yep I think you are right, but maybe this is closer to a more realistic scenario
-// and accounts for developmental noise? Although I am not sure how much that is relevant
-// to observing division of tasks, we could change this?
-
 // function to check maturity of female larvae after being fed
 template <> 
 bool Individual<2>::check_mature(double& birth_time, const params& p) {
-    if (bernoulli(logistic(body_size, p.dLarvaIntercept, p.dLarvaSlope))) {
+    if (body_size > p.dLarvaMatureSize) {
         is_larva = false;
-        t_birth = birth_time;
+        t_birth = birth_time + uni_real();
         return true;
     }
     return false;

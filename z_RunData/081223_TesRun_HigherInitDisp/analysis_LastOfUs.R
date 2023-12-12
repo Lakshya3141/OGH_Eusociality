@@ -1,4 +1,4 @@
-# Read the CSV file
+# Read the higher init displacement file CSV file
 data <- read.csv("output_LastOfUs.csv")
 
 # Subset data for individuals with t_death != -1

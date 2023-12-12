@@ -3,7 +3,7 @@ install.packages("tidyverse")
 library(tidyverse)
 
 # Read the CSV file
-data <- read.csv("output_million.csv")
+data <- read.csv("output_evolution.csv")
 
 # Plot choice_int_avg vs gtime
 ggplot(data, aes(x = gtime, y = choice_int_avg)) +

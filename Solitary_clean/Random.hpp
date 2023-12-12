@@ -16,6 +16,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <tuple>
 
 unsigned int simulationID = static_cast<unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count()); // sample a seed
 std::mt19937 rn(simulationID); // seed the random number generator
@@ -41,14 +42,11 @@ double exponential(double lambda) {
     return std::exponential_distribution<double>(lambda)(rn);
 }
 
-// lpgistic function
+// logistic function
 template <typename T>
 double logistic(T x, double intercept = 0.0, double slope = 1.0) {
     return 1 / (1 + exp(intercept + static_cast<double>(x) * slope));
 }
-// LCIP: this could be confusing because a *positive* slope implies that
-// the function *decreases* with x!
-
 
 // function that removes objects from a vector
 template <typename T = double>
@@ -91,17 +89,18 @@ std::vector<T> randomSubset(const std::vector<T>& individuals, int alpha) {
 
     if (alpha >= individuals.size()) {
         // Shuffle the entire vector if alpha is greater or equal to the vector size
-        std::random_device rd;
-        std::mt19937 g(rd());
-        std::shuffle(result.begin(), result.end(), g);
+        // std::random_device rd;
+        // std::mt19937 g(rd());
+        std::shuffle(result.begin(), result.end(), rn);
 
         return result;
     }
 
     // Shuffle the vector to randomize the selection
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(result.begin(), result.end(), g);
+    // std::random_device rd;
+    // std::mt19937 g(rd());
+    // LCIMP -> Check with Jan
+    std::shuffle(result.begin(), result.end(), rn);
 
     // Resize the vector to contain only alpha elements
     result.resize(alpha);
@@ -109,22 +108,33 @@ std::vector<T> randomSubset(const std::vector<T>& individuals, int alpha) {
     return result;
 }
 
-
-// Function to calculate the average of a vector of doubles
-double calculateAverage(const std::vector<double>& values) {
+// Function template to calculate the average of a vector of any numeric type
+template <typename T>
+T calculateAverage(const std::vector<T>& values) {
     if (values.empty()) {
         // Handle the case where the vector is empty to avoid division by zero
         std::cerr << "Error: Cannot calculate average of an empty vector." << std::endl;
-        return 0.0; // You may choose to return a special value or throw an exception here
+        return T();
     }
-
     // Calculate the sum of all elements in the vector
-    double sum = 0.0;
-    for (const double& value : values) {
+    T sum = T();
+    for (const auto& value : values) {
         sum += value;
     }
-
     // Calculate the average
-    return sum / static_cast<double>(values.size());
+    return sum / static_cast<T>(values.size());
 }
+
+// Function template to calculate the mean and standard deviation of a vector of any numeric type
+template <typename T>
+std::tuple<T, T> mean_std(const std::vector<T>& data) {
+    T mean = calculateAverage(data);
+    T std_dev = T();
+    for (const auto& value : data) {
+        std_dev += std::pow(value - mean, 2);
+    }
+    std_dev = std::sqrt(std_dev / static_cast<T>(data.size()));
+    return std::make_tuple(mean, std_dev);
+}
+
 #endif /* Random_hpp */

@@ -2,7 +2,7 @@
 # install.packages("tidyverse")
 # library(tidyverse)
 
-# Read the CSV file
+# Read the higher mutation v2 CSV file
 data <- read.csv("output_evolution.csv")
 
 # Plot choice_int_avg vs gtime

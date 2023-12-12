@@ -1,4 +1,4 @@
--> increased gevolution time from 1,000,000 to 300,000 and mutation stepsize from 0.12 to 0.15
+-> increased gevolution time from 10,000,000 to 3,000,000 and mutation stepsize from 0.12 to 0.15
 -> Last run took way too long so reduced furthers
 
 # Last simulation took 1.5 hours and still incomplete
