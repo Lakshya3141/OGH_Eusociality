@@ -15,13 +15,13 @@
 #include <algorithm>
 
 double gtime = 0.0;                     // Global time
-double max_gtime_evolution = 1000000.0;     // 100000.0 
+double max_gtime_evolution = 500000.0;     // 100000.0 
 double max_gtime_LastOfUs = 5000.0;  // 500;              // Maximum for last of us generation
 double dMaleRemovalTime = 100.0;         // every time unit males are removed
 double dOutputTimeInterval = 10.0;      // population state output time interval
 const unsigned int max_nests = 1000;    // 1000 // Maximum number of nests
 
-double dInitDispersal = -3.5;          // Initial value of the dispersal gene
+double dInitDispersal = -5.0;          // Initial value of the dispersal gene
 // Logistic expression looks like 1/(1+exp(a+b*x))
 double dInitChoiceIntercept = 0.0;    // Initial value of parameter a in task choice logistic expression
 double dInitChoiceSlope = 0.0;       // Initial value of parameter b in task choice logistic expression
@@ -42,7 +42,7 @@ struct params {
     double dDeathTime = 2.0;            // Time it takes for death
     // LCIP: why does this take time? -> Cause they may die in the middle of their task
     // so initially we wanted to keep this a uniform distribution maybe?
-    double dMaleLambda = 0.01;          // 1/Average lifespan of male
+    double dMaleLambda = 0.1;          // 1/Average lifespan of male
 
     double dMutRate = 0.01;              // Mutation probability
     double dMutBias = 0.0;              // Mutation Bias
