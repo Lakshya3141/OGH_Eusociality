@@ -89,17 +89,11 @@ std::vector<T> randomSubset(const std::vector<T>& individuals, int alpha) {
 
     if (alpha >= individuals.size()) {
         // Shuffle the entire vector if alpha is greater or equal to the vector size
-        // std::random_device rd;
-        // std::mt19937 g(rd());
         std::shuffle(result.begin(), result.end(), rn);
-
         return result;
     }
 
     // Shuffle the vector to randomize the selection
-    // std::random_device rd;
-    // std::mt19937 g(rd());
-    // LCIMP -> Check with Jan
     std::shuffle(result.begin(), result.end(), rn);
 
     // Resize the vector to contain only alpha elements
@@ -119,22 +113,23 @@ T calculateAverage(const std::vector<T>& values) {
     // Calculate the sum of all elements in the vector
     T sum = T();
     for (const auto& value : values) {
-        sum += value;
+        sum += static_cast<double>(value); // Typecast value to double
     }
     // Calculate the average
-    return sum / static_cast<T>(values.size());
+    return sum / static_cast<double>(values.size());
 }
 
 // Function template to calculate the mean and standard deviation of a vector of any numeric type
 template <typename T>
-std::tuple<T, T> mean_std(const std::vector<T>& data) {
-    T mean = calculateAverage(data);
-    T std_dev = T();
+std::tuple<double, double> mean_std(const std::vector<T>& data) {
+    double mean = calculateAverage(data);
+    double std_dev = 0.0;
     for (const auto& value : data) {
-        std_dev += std::pow(value - mean, 2);
+        std_dev += std::pow(static_cast<double>(value) - mean, 2);
     }
-    std_dev = std::sqrt(std_dev / static_cast<T>(data.size()));
+    std_dev = std::sqrt(std_dev / static_cast<double>(data.size()));
     return std::make_tuple(mean, std_dev);
 }
+
 
 #endif /* Random_hpp */

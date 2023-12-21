@@ -45,8 +45,8 @@ p4 <- ggplot(data, aes(x = event, y = gtime)) +
 
 # Plot total females and total males vs gtime
 p5 <- ggplot(data, aes(x = gtime)) +
-  geom_line(aes(y = num_female, color = "Total Females"), linetype = "solid") +
   geom_line(aes(y = num_male, color = "Total Males"), linetype = "dashed") +
+  geom_line(aes(y = num_female, color = "Total Females"), linetype = "solid") +
   labs(title = "Total Females and Males vs. gtime", x = "gtime", y = "Count") +
   theme_minimal() +
   theme(legend.position="top") +
@@ -87,7 +87,7 @@ subset_data$lifespan <- subset_data$t_death - subset_data$t_birth
 
 # Create a histogram using ggplot2
 histogram <- ggplot(subset_data, aes(x = lifespan)) +
-  geom_histogram(binwidth = 5, fill = "lightblue", color = "black") +
+  geom_histogram(fill = "lightblue", color = "black") +
   labs(title = "Histogram of Lifespans", x = "Lifespan") +
   theme_minimal() +
   theme(legend.position = "none") +
@@ -148,7 +148,7 @@ ggsave("output/LastOfUs_ReactionNorms.png", p, width = 8, height = 6)
 
 # Plot a histogram of dispersal values for alpha individuals
 pdisp <- ggplot(subset_alpha_data, aes(x = dispersal)) +
-  geom_histogram(binwidth = 0.1, fill = "lightblue", color = "black") +
+  geom_histogram(fill = "lightblue", color = "black") +
   labs(title = "Histogram of Dispersal Values for Sampled LastOfUs", x = "Dispersal", y = "Count") +
   theme_minimal()
 

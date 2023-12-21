@@ -1,0 +1,70 @@
+Global Parameters:
+max_gtime_evolution = 500000
+max_gtime_LastOfUs = 5000
+dMaleRemovalTime = 100
+dOutputTimeInterval = 10
+max_nests = 1000
+dInitDispersal = -3
+dInitChoiceIntercept = 0
+dInitChoiceSlope = 0
+
+Reading from config file: config.ini
+dLarvaMatureSize = 1
+dForagingTime = 3
+dBroodingTime = 4
+dDeathTime = 2
+dMaleLambda = 0.1
+dMutRate = 0.01
+dMutBias = 0
+dMutEffect = 0.06
+dSurvForage = 0.98
+dSurvBrood = 0.99
+dForagingMean = 0.5
+dForagingSD = 0.2
+const_sex_ratio = 0.5
+params_to_record = dBroodingTime
+
+Initial population simulation took 363.98 seconds
+
+Last of Us simulation took 15.61 seconds
+
+
+###############################################################################
+Hábrók Cluster
+Job 6561283 for user s5381029
+Finished at: Wed Dec 13 11:23:15 CET 2023
+
+Job details:
+============
+
+Job ID              : 6561283
+Name                : FirstSolitary_output
+User                : s5381029
+Partition           : regularshort
+Nodes               : node80
+Number of Nodes     : 1
+Cores               : 1
+Number of Tasks     : 1
+State               : COMPLETED
+Submit              : 2023-12-13T11:16:32
+Start               : 2023-12-13T11:16:32
+End                 : 2023-12-13T11:23:15
+Reserved walltime   : 05:00:00
+Used walltime       : 00:06:43
+Used CPU time       : 00:06:36 (efficiency: 98.26%)
+% User (Computation): 98.13%
+% System (I/O)      :  1.87%
+Mem reserved        : 3G
+Max Mem (Node/step) : 2.52G (node80, per node)
+Full Max Mem usage  : 2.52G
+Total Disk Read     : 67.50M
+Total Disk Write    : 346.02M
+
+Acknowledgements:
+=================
+
+Please see this page for information about acknowledging Hábrók in your publications:
+
+https://wiki.hpc.rug.nl/habrok/introduction/scientific_output
+
+################################################################################

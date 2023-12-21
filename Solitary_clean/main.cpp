@@ -42,6 +42,8 @@ int main(int argc, char* argv[]) {
     std::cout << std::endl;
     std::cout << "Initial population simulation took " << std::chrono::duration<double>(diff).count() << " seconds" << std::endl;
     
+    std::cout << "\nSTARTING last of us" << std::endl;
+
     auto start2 = std::chrono::high_resolution_clock::now();
     
     Population lastGen = myPop.initialise_LastOfUs();
@@ -55,8 +57,6 @@ int main(int argc, char* argv[]) {
     auto diff2 = end2 - start2;
     std::cout << std::endl;
     std::cout << "Last of Us simulation took " << std::chrono::duration<double>(diff2).count() << " seconds\n" << std::endl;
-    
-
     return 0; 
   }
   catch (const std::exception& err) {

@@ -82,9 +82,7 @@ void Population::initialise_pop() {
         eve.t_next = uni_real();                // impart asynchronous acting time
         eve.is_foraging = false;                // set breeder
         ++nest_id_counter;                      
-        nests.emplace_back(eve, eve.nest_id);  
-        // LCIP: could have moved eve since she is not re-used.
-        // Decided not to in the end cause will have to do other calls then
+        nests.emplace_back(eve, eve.nest_id);
     }
 }
 
@@ -111,7 +109,7 @@ void Population::simulate_tst(const std::string& output_filename) {
     }
 
     std::ofstream csv_file(output_filename);
-    csv_file << "gtime,event,choice_int_avg,choice_int_std,choice_slope_avg,choice_slope_std,dispersal_avg,dispersal_std,num_female,num_male,fem_avg,fem_std,femLarv_avg,femLarv_std,malLarv_avg,malLarv_std" <<std::endl;
+    csv_file << "gtime,event,choice_int_avg,choice_int_std,choice_slope_avg,choice_slope_std,dispersal_avg,dispersal_std,num_female,num_male,fem_avg,fem_std,femLarv_avg,femLarv_std,malLarv_avg,malLarv_std,totLarv_avg,totLarv_std" <<std::endl;
 
     unsigned long int event = 0;
 
@@ -523,7 +521,8 @@ void Population::printPopulationState(std::ostream& csv_file, const unsigned lon
         return; // Skip removal if not enough time has passed
     }
     // csv_file << "gtime,event,choice_int_avg,choice_int_std,choice_slope_avg,choice_slope_std,
-    // dispersal_avg,dispersal_std,num_female,num_male,fem_avg,fem_std,femLarv_avg,femLarv_std,malLarv_avg,malLarv_std" <<std::endl;
+    // dispersal_avg,dispersal_std,num_female,num_male,fem_avg,fem_std,femLarv_avg,
+    // femLarv_std,malLarv_avg,malLarv_std,totLarv_avg,totLarv_std" <<std::endl;
 
     csv_file << gtime << "," << event;
     
@@ -533,6 +532,7 @@ void Population::printPopulationState(std::ostream& csv_file, const unsigned lon
     std::vector<int> fem_values;
     std::vector<int> femLarv_values;
     std::vector<int> malLarv_values;
+    std::vector<int> totLarv_values;
     int total_females = 0;
     // Collect dispersal values for all females
     for (auto& nest : nests) {
@@ -540,6 +540,7 @@ void Population::printPopulationState(std::ostream& csv_file, const unsigned lon
         femLarv_values.push_back(nest.larval_females.size());
         malLarv_values.push_back(nest.larval_males.size());
         total_females += nest.adult_females.size();
+        totLarv_values.push_back(nest.larval_females.size() + nest.larval_males.size());
 
         for (auto& female : nest.adult_females) {
             dispersal_values.push_back(female.phenotype_dispersal);
@@ -569,7 +570,6 @@ void Population::printPopulationState(std::ostream& csv_file, const unsigned lon
     // Output mean and standard deviation to CSV
     csv_file << "," << std::get<0>(stat) << "," << std::get<1>(stat);
 
-
     stat = mean_std(femLarv_values);
     // Output mean and standard deviation to CSV
     csv_file << "," << std::get<0>(stat) << "," << std::get<1>(stat);
@@ -578,6 +578,10 @@ void Population::printPopulationState(std::ostream& csv_file, const unsigned lon
     // Output mean and standard deviation to CSV
     csv_file << "," << std::get<0>(stat) << "," << std::get<1>(stat);
     
+    stat = mean_std(totLarv_values);
+    // Output mean and standard deviation to CSV
+    csv_file << "," << std::get<0>(stat) << "," << std::get<1>(stat);
+
     // End the CSV line
     csv_file << "\n";
     // Update the last removal time

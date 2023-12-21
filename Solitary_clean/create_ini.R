@@ -16,7 +16,7 @@ create_config <- function(config_file_name = "config.ini",
                           dSurvBrood = 0.99,
                           dForagingMean = 0.5,
                           dForagingSD = 0.2,
-                          const_sex_ratio = 0.5,
+                          const_sex_ratio = 0.25,
                           params_to_record = "dBroodingTime") {
   
   newini <- list()

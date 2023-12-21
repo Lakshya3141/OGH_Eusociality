@@ -15,7 +15,7 @@
 #include <algorithm>
 
 double gtime = 0.0;                     // Global time
-double max_gtime_evolution = 1000.0;     // 100000.0 
+double max_gtime_evolution = 10000.0;     // 100000.0 
 double max_gtime_LastOfUs = 50.0;  // 500;              // Maximum for last of us generation
 double dMaleRemovalTime = 100.0;         // every time unit males are removed
 double dOutputTimeInterval = 10.0;      // population state output time interval

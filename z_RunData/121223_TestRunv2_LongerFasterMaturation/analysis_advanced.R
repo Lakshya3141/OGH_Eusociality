@@ -45,8 +45,8 @@ p4 <- ggplot(data, aes(x = event, y = gtime)) +
 
 # Plot total females and total males vs gtime
 p5 <- ggplot(data, aes(x = gtime)) +
-  geom_line(aes(y = num_female, color = "Total Females"), linetype = "solid") +
   geom_line(aes(y = num_male, color = "Total Males"), linetype = "dashed") +
+  geom_line(aes(y = num_female, color = "Total Females"), linetype = "solid") +
   labs(title = "Total Females and Males vs. gtime", x = "gtime", y = "Count") +
   theme_minimal() +
   theme(legend.position="top") +
@@ -73,7 +73,7 @@ ggsave("output/evolution_choiceSlope.png", p2, width = 8, height = 6)
 ggsave("output/evolution_dispersal.png", p3, width = 8, height = 6)
 ggsave("output/evolution_GtimeVsEvents.png", p4, width = 8, height = 6)
 ggsave("output/evolution_TotalAdults.png", p5, width = 8, height = 6)
-ggsave("output/evoltion_NestWisePopulation.png", p6, width = 8, height = 6)
+ggsave("output/evolution_NestWisePopulation.png", p6, width = 8, height = 6)
 
 
 # Read the higher mutation v2 CSV file
@@ -139,7 +139,7 @@ x = seq(0, max_larva, length.out = 100)
 # Loop to add logistic curves to the plot
 for (i in seq(1:alpha)) {
   curve <- data.frame(x = x, 
-                      y = 1 / (1 + exp(subset_alpha_data$choice_int[i] + subset_alpha_data$choice_int[i] * x)))
+                      y = 1 / (1 + exp(subset_alpha_data$choice_int[i] + subset_alpha_data$choice_slope[i] * x)))
   p <- p + geom_line(data = curve, aes(x = x, y = y, group = factor(i)))
 }
 
