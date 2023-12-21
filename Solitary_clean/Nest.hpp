@@ -61,8 +61,6 @@ std::tuple<bool, bool, size_t> Nest::feed(const double& mean, const double& SD) 
 Nest::Nest(const Individual<2>& f, const int nid) : nest_id(nid) {
     adult_females.push_back(f);
 } // Constructor for nest
-// LCIP: maybe let (a) constructor accept r-value female so it can be moved insetad of copied ...
-// Decided not to in the end would cause too many calls
 
 
 

@@ -94,7 +94,6 @@ Individual<2>::Individual (const int id, const Individual<2>& mum, const params&
     genome[0] = mum.sperm;
     genome[1].genes_dispersal = mum.genome[bernoulli()].genes_dispersal;
 
-    // LCIP: Yes, we have full recombination for slope and choice
     for(int i = 0; i < 2; ++i) {
         genome[1].genes_choice[i] = mum.genome[bernoulli()].genes_choice[i];
     }
