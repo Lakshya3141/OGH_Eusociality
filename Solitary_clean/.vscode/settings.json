@@ -71,7 +71,8 @@
         "list": "cpp",
         "unordered_map": "cpp",
         "xhash": "cpp",
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "filesystem": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

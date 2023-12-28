@@ -1,9 +1,7 @@
 #include <iostream>
 #include "Population.hpp"
-
 #include <iomanip> // For std::setprecision
 #include <sstream> // For std::ostringstream
-
 
 int main(int argc, char* argv[]) {
   try {
@@ -17,7 +15,7 @@ int main(int argc, char* argv[]) {
     std::cout << "dInitDispersal = " << dInitDispersal << std::endl;
     std::cout << "dInitChoiceIntercept = " << dInitChoiceIntercept << std::endl;
     std::cout << "dInitChoiceSlope = " << dInitChoiceSlope << std::endl;
-
+    std::cout << "Simulation ID = " << simulationID << std::endl;
     std::cout << "\nReading from config file: " << file_name << "\n";
     std::ifstream test_file(file_name.c_str());
     if (!test_file.is_open()) {
@@ -26,16 +24,43 @@ int main(int argc, char* argv[]) {
     test_file.close();
 
     params sim_par_in(file_name);
-    
+
+    // Create CSV output folder
+    std::string csv_folder = "OutputCSV";
+    if (!fs::exists(csv_folder)) {
+        try {
+            fs::create_directory(csv_folder);
+            std::cout << "Folder created successfully." << std::endl;
+        } catch (const std::filesystem::filesystem_error& e) {
+            std::cerr << "Error creating folder: " << e.what() << std::endl;
+            return 1;
+        }
+    } else {
+        std::cout << "Folder already exists." << std::endl;
+    }
+
+    // Create Images output folder
+    std::string images_folder = "OutputImages";
+    if (!fs::exists(images_folder)) {
+        try {
+            fs::create_directory(images_folder);
+            std::cout << "Folder created successfully." << std::endl;
+        } catch (const std::filesystem::filesystem_error& e) {
+            std::cerr << "Error creating folder: " << e.what() << std::endl;
+            return 1;
+        }
+    } else {
+        std::cout << "Folder already exists." << std::endl;
+    }
+
     auto start = std::chrono::high_resolution_clock::now();
     
     Population myPop(sim_par_in);
     myPop.initialise_pop();
 
-    std::string output_pop = "output_evolution.csv";
     std::cout << std::fixed;
     std::cout << std::setprecision(2);
-    myPop.simulate_tst(output_pop);
+    myPop.simulate_tst(csv_folder);
 
     auto end = std::chrono::high_resolution_clock::now();
     auto diff = end - start;
@@ -50,8 +75,7 @@ int main(int argc, char* argv[]) {
     
     std::cout << std::fixed;
     std::cout << std::setprecision(2);
-    std::string output_LastOfUs = "output_LastOfUs.csv";
-    lastGen.simulate_LastOfUs(output_LastOfUs);
+    lastGen.simulate_LastOfUs(csv_folder);
 
     auto end2 = std::chrono::high_resolution_clock::now();
     auto diff2 = end2 - start2;

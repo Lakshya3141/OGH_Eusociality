@@ -6,17 +6,17 @@ create_config <- function(config_file_name = "config.ini",
                           dForagingTime = 3.0,
                           dBroodingTime = 4.0,
                           dDeathTime = 2.0,
-                          dMaleLambda = 0.1,
+                          dMaleLambda = 0.01,
                           
-                          dMutRate = 0.01,
+                          dMutRate = 0.03,
                           dMutBias = 0.0,
-                          dMutEffect = 0.06,
+                          dMutEffect = 0.10,
                           
                           dSurvForage = 0.98,
                           dSurvBrood = 0.99,
-                          dForagingMean = 0.5,
-                          dForagingSD = 0.2,
-                          const_sex_ratio = 0.25,
+                          dForagingMean = 1.0,
+                          dForagingSD = 0.5,
+                          const_sex_ratio = 0.5,
                           params_to_record = "dBroodingTime") {
   
   newini <- list()

@@ -2,10 +2,10 @@ library(tidyverse)
 library(ggpubr)
 library(gridExtra)
 
-data <- read.csv("output_evolution.csv")
+data <- read.csv("OutputCSV/evolution.csv")
 
 # Create output folder if not exists
-dir.create("output", showWarnings = FALSE)
+# dir.create("output", showWarnings = FALSE)
 
 # Plot choice_int_avg vs gtime with standard deviation
 p1 <- ggplot(data, aes(x = gtime, y = choice_int_avg, color = "Choice Intercept")) +
@@ -68,16 +68,16 @@ p6 <- ggplot(data, aes(x = gtime)) +
   guides(color = guide_legend(title = NULL))
 
 # Save individual plots as images in the output folder
-ggsave("output/evolution_choiceIntercept.png", p1, width = 8, height = 6)
-ggsave("output/evolution_choiceSlope.png", p2, width = 8, height = 6)
-ggsave("output/evolution_dispersal.png", p3, width = 8, height = 6)
-ggsave("output/evolution_GtimeVsEvents.png", p4, width = 8, height = 6)
-ggsave("output/evolution_TotalAdults.png", p5, width = 8, height = 6)
-ggsave("output/evoltion_NestWisePopulation.png", p6, width = 8, height = 6)
+ggsave("OutputImages/evolution_choiceIntercept.png", p1, width = 8, height = 6)
+ggsave("OutputImages/evolution_choiceSlope.png", p2, width = 8, height = 6)
+ggsave("OutputImages/evolution_dispersal.png", p3, width = 8, height = 6)
+ggsave("OutputImages/evolution_GtimeVsEvents.png", p4, width = 8, height = 6)
+ggsave("OutputImages/evolution_TotalAdults.png", p5, width = 8, height = 6)
+ggsave("OutputImages/evoltion_NestWisePopulation.png", p6, width = 8, height = 6)
 
 
 # Read the higher mutation v2 CSV file
-data_last <- read.csv("output_LastOfUs.csv")
+data_last <- read.csv("OutputCSV/LastOfUs.csv")
 
 # Subset data for individuals with t_death != -1
 subset_data <- data_last[data_last$t_death != -1, ]
@@ -96,7 +96,7 @@ histogram <- ggplot(subset_data, aes(x = lifespan)) +
            label = paste("Average Lifespan:", round(mean(subset_data$lifespan, na.rm = TRUE), 2)), col = "red")
 
 # Save the plot
-ggsave("output/LastOfUs_HistLifespan.png", plot = histogram)
+ggsave("OutputImages/LastOfUs_HistLifespan.png", plot = histogram)
 
 # Add a line at the average lifespan
 avg_lifespan <- mean(subset_data$lifespan, na.rm = TRUE)
@@ -144,7 +144,7 @@ for (i in seq(1:alpha)) {
 }
 
 # Save the plot
-ggsave("output/LastOfUs_ReactionNorms.png", p, width = 8, height = 6)
+ggsave("OutputImages/LastOfUs_ReactionNorms.png", p, width = 8, height = 6)
 
 # Plot a histogram of dispersal values for alpha individuals
 pdisp <- ggplot(subset_alpha_data, aes(x = dispersal)) +
@@ -153,4 +153,4 @@ pdisp <- ggplot(subset_alpha_data, aes(x = dispersal)) +
   theme_minimal()
 
 # Save the plot
-ggsave("output/LastOfUs_HistDispersal.png", pdisp, width = 8, height = 6)
+ggsave("OutputImages/LastOfUs_HistDispersal.png", pdisp, width = 8, height = 6)
