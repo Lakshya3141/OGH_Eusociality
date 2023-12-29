@@ -1,26 +1,29 @@
 library(tidyverse)
 library(ggpubr)
 library(gridExtra)
+library(patchwork)
+
 
 data <- read.csv("OutputCSV/evolution.csv")
 
 # Create output folder if not exists
-# dir.create("output", showWarnings = FALSE)
+dir.create("OutputImages", showWarnings = FALSE)
 
 # Plot choice_int_avg vs gtime with standard deviation
 p1 <- ggplot(data, aes(x = gtime, y = choice_int_avg, color = "Choice Intercept")) +
   geom_line() +
-  geom_ribbon(aes(ymin = choice_int_avg - choice_int_std, ymax = choice_int_avg + choice_int_std), alpha = 0.3, fill = "blue") +
+  geom_ribbon(aes(ymin = choice_int_avg - choice_int_std, ymax = choice_int_avg + choice_int_std), alpha = 0.3, fill = "blue", color = NA) +  # Remove boundary color
   labs(title = "Choice Intercept Average vs. gtime ", x = "gtime", y = "Choice Intercept Average") +
   theme_minimal() +
   theme(legend.position="top") +
   scale_color_manual(values = "blue") +
   guides(color = guide_legend(title = NULL))
 
+
 # Plot choice_slope_avg vs gtime with standard deviation
 p2 <- ggplot(data, aes(x = gtime, y = choice_slope_avg, color = "Choice Slope")) +
   geom_line() +
-  geom_ribbon(aes(ymin = choice_slope_avg - choice_slope_std, ymax = choice_slope_avg + choice_slope_std), alpha = 0.3, fill = "red") +
+  geom_ribbon(aes(ymin = choice_slope_avg - choice_slope_std, ymax = choice_slope_avg + choice_slope_std), alpha = 0.3, fill = "red", color = NA) +
   labs(title = "Choice Slope Average vs. gtime ", x = "gtime", y = "Choice Slope Average") +
   theme_minimal() +
   theme(legend.position="top") +
@@ -30,7 +33,7 @@ p2 <- ggplot(data, aes(x = gtime, y = choice_slope_avg, color = "Choice Slope"))
 # Plot dispersal_mean vs gtime with standard deviation
 p3 <- ggplot(data, aes(x = gtime, y = dispersal_avg, color = "Dispersal Mean")) +
   geom_line() +
-  geom_ribbon(aes(ymin = dispersal_avg - dispersal_std, ymax = dispersal_avg + dispersal_std), alpha = 0.3, fill = "green") +
+  geom_ribbon(aes(ymin = dispersal_avg - dispersal_std, ymax = dispersal_avg + dispersal_std), alpha = 0.3, fill = "green", color = NA) +
   labs(title = "Dispersal Average vs. gtime ", x = "gtime", y = "Dispersal Mean") +
   theme_minimal() +
   theme(legend.position="top") +
@@ -56,12 +59,9 @@ p5 <- ggplot(data, aes(x = gtime)) +
 # Plot fem_avg, femLarv_avg, and malLarv_avg with standard deviations vs gtime
 p6 <- ggplot(data, aes(x = gtime)) +
   geom_line(aes(y = fem_avg, color = "Fem Avg"), linetype = "solid") +
-  geom_ribbon(aes(ymin = fem_avg - fem_std, ymax = fem_avg + fem_std), alpha = 0.3, fill = "blue") +
-  geom_line(aes(y = femLarv_avg, color = "FemLarv Avg"), linetype = "dashed") +
-  geom_ribbon(aes(ymin = femLarv_avg - femLarv_std, ymax = femLarv_avg + femLarv_std), alpha = 0.3, fill = "red") +
-  geom_line(aes(y = malLarv_avg, color = "MalLarv Avg"), linetype = "dotted") +
-  geom_ribbon(aes(ymin = malLarv_avg - malLarv_std, ymax = malLarv_avg + malLarv_std), alpha = 0.3, fill = "green") +
-  labs(title = "Avg and Std Dev of Fem Avg, FemLarv Avg, and MalLarv Avg vs. gtime", x = "gtime", y = "Average") +
+  geom_line(aes(y = femLarv_avg, color = "FemLarv Avg"), linetype = "solid") +
+  geom_line(aes(y = malLarv_avg, color = "MalLarv Avg"), linetype = "solid") +
+  labs(title = "Avg and NestWise Fem Avg, FemLarv Avg, and MalLarv Avg vs. gtime", x = "gtime", y = "Average") +
   theme_minimal() +
   theme(legend.position="top") +
   scale_color_manual(values = c("Fem Avg" = "blue", "FemLarv Avg" = "red", "MalLarv Avg" = "green")) +
@@ -120,7 +120,7 @@ unique_starting_individuals <- data_last[1:1000, ] %>%
   slice(which.max(ind_id < 1000))
 
 alpha <- unique_starting_individuals$ind_id + 1
-alpha <- 200 # In case of just 100 individuals
+alpha <- 100 # In case of just 100 individuals
 
 # Take the first alpha rows of output_LastOfUs.csv
 subset_alpha_data <- data_last[1:alpha, ]
@@ -139,7 +139,7 @@ x = seq(0, max_larva, length.out = 100)
 # Loop to add logistic curves to the plot
 for (i in seq(1:alpha)) {
   curve <- data.frame(x = x, 
-                      y = 1 / (1 + exp(subset_alpha_data$choice_int[i] + subset_alpha_data$choice_int[i] * x)))
+                      y = 1 / (1 + exp(subset_alpha_data$choice_int[i] + subset_alpha_data$choice_slope[i] * x)))
   p <- p + geom_line(data = curve, aes(x = x, y = y, group = factor(i)))
 }
 
@@ -154,3 +154,101 @@ pdisp <- ggplot(subset_alpha_data, aes(x = dispersal)) +
 
 # Save the plot
 ggsave("OutputImages/LastOfUs_HistDispersal.png", pdisp, width = 8, height = 6)
+
+# Find the total number of unique nest IDs
+unique_nest_ids <- unique(data_last$nest_id)
+
+# Randomly sample 100 nest IDs
+sampled_nest_ids <- sample(unique_nest_ids, 100)
+
+# Initialize an empty plot for p7
+p7 <- ggplot() +
+  labs(title = "Nestwise Adult Female Growth of Sampled Nests", x = "gtime", y = "Number of Adult Females") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# Loop through the sampled nest IDs
+for (nest_id in sampled_nest_ids) {
+  # Subset data for the current nest ID
+  subset_nest_data <- data_last[data_last$nest_id == nest_id, ]
+  
+  # Plot num_adults vs gtime for the current nest
+  p7 <- p7 + geom_line(data = subset_nest_data, aes(x = gtime, y = num_adults, group = factor(nest_id)))
+}
+
+# Save the plot
+ggsave("OutputImages/LastOfUs_AdultNestwiseGrowth.png", p7, width = 8, height = 6)
+
+##### LoU: Specialisation graphs #####
+# Set seed for reproducibility
+set.seed(123)
+
+# Randomly select 4 unique nest IDs
+random_nest_ids <- sample(unique(data_last$nest_id), 4)
+
+# Initialize a list to store plots
+plot_list_pertime <- list()
+plot_list_perchoice <- list()
+
+# Loop through the randomly selected nest IDs
+for (nest_id in random_nest_ids) {
+  # Subset data for the current nest ID
+  subset_nest_data <- data_last[data_last$nest_id == nest_id, ]
+  
+  # Calculate total number of task switches and their percentage for each individual with more than 10 tasks
+  unique_individuals <- unique(subset_nest_data$ind_id)
+  
+  # Initialize data frames to store results
+  task_choice_data <- data.frame(ind_id = numeric(),
+                                 total_task_choices = numeric(),
+                                 pertime_foraging = numeric(),
+                                 perchoice_foraging = numeric())
+  
+  # Loop through unique individual IDs
+  for (ind_id in unique_individuals) {
+    # Subset data for the current individual ID
+    subset_ind_data <- subset_nest_data[subset_nest_data$ind_id == ind_id, ]
+    
+    # Check if the individual has more than 10 tasks
+    if (nrow(subset_ind_data) > 10) {
+      # Calculate total number of task switches
+      total_task_choices <- nrow(subset_ind_data)
+      
+      # Calculate total time spent foraging
+      pertime_foraging <- sum(subset_ind_data$current_foraging * 3.0) / sum(subset_ind_data$current_foraging * 3.0 + (1 - subset_ind_data$current_foraging) * 4.0)
+      
+      # Calculate task foraging percentage
+      perchoice_foraging <- sum(subset_ind_data$current_foraging) / nrow(subset_ind_data)
+      
+      # Append results to the data frame
+      task_choice_data <- rbind(task_choice_data,
+                                data.frame(ind_id = ind_id,
+                                           total_task_choices = total_task_choices,
+                                           pertime_foraging = pertime_foraging,
+                                           perchoice_foraging = perchoice_foraging))
+    }
+  }
+  
+  # Create histogram for total time spent foraging
+  p8 <- ggplot(task_choice_data, aes(x = pertime_foraging)) +
+    geom_histogram(fill = "lightblue", color = "black") +
+    labs(title = paste("Nest ID:", nest_id), x = "Total Time Foraging", y = "Count") +
+    theme_minimal()
+  
+  # Save the plot to the list
+  plot_list_pertime[[paste("Nest", nest_id, sep = "_")]] <- p8
+  
+  # Create histogram for task foraging percentage
+  p9 <- ggplot(task_choice_data, aes(x = perchoice_foraging)) +
+    geom_histogram(fill = "lightblue", color = "black") +
+    labs(title = paste("Nest ID:", nest_id), x = "Task Foraging Percentage", y = "Count") +
+    theme_minimal()
+  
+  # Save the plot to the list
+  plot_list_perchoice[[paste("Nest", nest_id, sep = "_")]] <- p9
+}
+
+
+# Save the combined plot
+ggsave(paste("OutputImages/LastOfUs_HistTimeForaging.png", sep = ""), wrap_plots(plot_list_pertime), width = 12, height = 8)
+ggsave(paste("OutputImages/LastOfUs_HistTaskForaging.png", sep = ""), wrap_plots(plot_list_perchoice), width = 12, height = 8)

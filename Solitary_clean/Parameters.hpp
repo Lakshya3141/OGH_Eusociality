@@ -25,6 +25,9 @@ double dInitDispersal = -5.0;          // Initial value of the dispersal gene
 // Logistic expression looks like 1/(1+exp(a+b*x))
 double dInitChoiceIntercept = 0.0;    // Initial value of parameter a in task choice logistic expression
 double dInitChoiceSlope = 0.0;       // Initial value of parameter b in task choice logistic expression
+bool bIsAdditive = true;            // gene expression is additive if true, otherwise only one is expressed
+bool bRecombLocus = true;           // 0.5 recombination chance of each locus of every gene if true
+                                    // else recombination is genewise
 
 struct params {
 
