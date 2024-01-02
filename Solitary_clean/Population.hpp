@@ -46,10 +46,10 @@ public:
     void removeDeadMales();                         // to remove dead males
     int findIndexByNestId(unsigned int nestId);     // returns index of Nest ID in nests vector
 
-    void simulate_tst(const std::string& output_folder);                            // simulate function
+    void simulate_tst(const std::vector<std::string>& param_names, const std::string& output_folder);                            // simulate function
     Population initialise_LastOfUs();                       // initialise the last generation as per output testing discussed
-    void simulate_LastOfUs(const std::string& output_folder);
-    void printPopulationState(std::ostream& csv_file, const unsigned long int event);  // add row of data to population state file
+    void simulate_LastOfUs(const std::vector<std::string>& param_names, const std::string& output_folder);
+    void printPopulationState(const std::vector< float >& param_values, std::ostream& csv_file, const unsigned long int event);  // add row of data to population state file
     
     unsigned int nest_id_counter = 0;               // nest ID counter 
     unsigned int individual_id_counter = 0;         // individual ID counter
@@ -101,7 +101,7 @@ int Population::findIndexByNestId(unsigned int nestId) {
     }
 
 // Simulate function for initalised population
-void Population::simulate_tst(const std::string& output_folder) {
+void Population::simulate_tst(const std::vector<std::string>& param_names, const std::string& output_folder) {
     // Create a priority queue to track individuals by their next action time
     std::priority_queue<track_time, std::vector<track_time>, decltype(cmptime)> event_queue(cmptime);
     // Initialize the event queue with individuals and their initial next action times
@@ -114,6 +114,11 @@ void Population::simulate_tst(const std::string& output_folder) {
     fs::path filePath = fs::path(output_folder) / "evolution.csv";
 
     std::ofstream csv_file(filePath);
+    
+    for (auto i : param_names) {
+        csv_file << i << ',';
+    }
+    
     csv_file << "gtime,event,choice_int_avg,choice_int_std,choice_slope_avg,choice_slope_std,dispersal_avg,dispersal_std,num_female,num_male,fem_avg,fem_std,femLarv_avg,femLarv_std,malLarv_avg,malLarv_std,totLarv_avg,totLarv_std" <<std::endl;
 
     unsigned long int event = 0;
@@ -131,7 +136,7 @@ void Population::simulate_tst(const std::string& output_folder) {
         removeDeadMales();
 
         // output
-        printPopulationState(csv_file, event);
+        printPopulationState(p.params_to_record, csv_file, event);
 
         // Get the individual with the earliest next action time, pop it from queue
         // find nest index (cnestid) based on event's nest ID and individual ID (cindid)
@@ -322,7 +327,7 @@ Population Population::initialise_LastOfUs() {
     // Initialise new population with selected females;
     Population newGen(p);
     // LCIMP No mutation happening in the Last of Us generation
-    newGen.p.dMutRate = 0.0;
+    newGen.p.dMutEffect = 0.00001;
     // clear vectors
     // newGen.adult_males = newPop_males;
 
@@ -356,7 +361,7 @@ Population Population::initialise_LastOfUs() {
 }
 
 // Function to simulate the last generation until death of all colonies or a certain event time period
-void Population::simulate_LastOfUs(const std::string& output_folder){
+void Population::simulate_LastOfUs(const std::vector<std::string>& param_names, const std::string& output_folder){
     // Create a priority queue to track individuals by their next action time
     std::priority_queue<track_time, std::vector<track_time>, decltype(cmptime)> event_queue(cmptime);
 
@@ -371,6 +376,11 @@ void Population::simulate_LastOfUs(const std::string& output_folder){
 
     std::ofstream csv_file(filePath);
     // TST add nest female size as well (larval vectors size also)
+    
+    for (auto i : param_names) {
+        csv_file << i << ',';
+    }
+    
     csv_file << "event,gtime,nest_id,ind_id,mom_id,dad_id,is_mated,mate_id,current_foraging,next_foraging,num_female_larva,num_larva,t_birth,is_alive,t_death,dispersal,choice_int,choice_slope,num_femlarva,num_malelarva,num_adults"<<std::endl;
 
     unsigned long int event = 0;
@@ -469,7 +479,7 @@ void Population::simulate_LastOfUs(const std::string& output_folder){
             nests[cnestid].adult_females.erase(nests[cnestid].adult_females.begin() + current_index);
         }
 
-        nests[current.nest_id].printIndividualEventCSV(csv_file, current, recent, event);
+        nests[current.nest_id].printIndividualEventCSV(p.params_to_record, csv_file, current, recent, event);
         event++;
     }
     csv_file.close();
@@ -527,7 +537,7 @@ void Population::removeDeadMales() {
 }
 
 // function to print population state compared to gtime
-void Population::printPopulationState(std::ostream& csv_file, const unsigned long int event) {
+void Population::printPopulationState(const std::vector< float >& param_values, std::ostream& csv_file, const unsigned long int event) {
     // Check if enough time has passed since the last removal
     if (gtime - last_output_time < dOutputTimeInterval) {
         return; // Skip removal if not enough time has passed
@@ -536,6 +546,10 @@ void Population::printPopulationState(std::ostream& csv_file, const unsigned lon
     // dispersal_avg,dispersal_std,num_female,num_male,fem_avg,fem_std,femLarv_avg,
     // femLarv_std,malLarv_avg,malLarv_std,totLarv_avg,totLarv_std" <<std::endl;
 
+    for (auto i : param_values) {
+      csv_file << i << ',';
+    }
+    
     csv_file << gtime << "," << event;
     
     std::vector<double> dispersal_values;

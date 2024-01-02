@@ -22,7 +22,7 @@ public:
     size_t findFemaleIndexById(const int id);
     void mate_withinNest(Individual<2>& female);
     std::tuple<bool, size_t> choose_RndmMaleLarva();
-    void printIndividualEventCSV(std::ostream& csv_file, const Individual<2>& current, const Individual<2>& recent, const unsigned long int event);
+    void printIndividualEventCSV(const std::vector< float >& param_values, std::ostream& csv_file, const Individual<2>& current, const Individual<2>& recent, const unsigned long int event);
 
     unsigned int nest_id;
     std::vector<Individual<2> > adult_females;          // vector of adult females, [0] = breeder
@@ -122,9 +122,13 @@ std::tuple<bool, size_t> Nest::choose_RndmMaleLarva(){
 }
 
 // Function for LastOfUs output
-void Nest::printIndividualEventCSV(std::ostream& csv_file, const Individual<2>& current, const Individual<2>& recent, const unsigned long int event) {
+void Nest::printIndividualEventCSV(const std::vector< float >& param_values, std::ostream& csv_file, const Individual<2>& current, const Individual<2>& recent, const unsigned long int event) {
     // csv_file << "event,gtime,nest_id,ind_id,mom_id,dad_id,is_mated,mate_id,current_foraging,next_foraging,num_female_larva,num_larva,t_birth,is_alive,t_death,dispersal,choice_int,choice_slope,num_femlarva,num_malelarva,num_adults"<<std::endl;
 
+    for (auto i : param_values) {
+      csv_file << i << ',';
+    }
+    
     csv_file << event << "," << gtime << "," << current.nest_id << "," << current.ind_id << ","
               << current.mom_id << "," << current.dad_id << "," << current.is_mated << ","
               << current.mate_id << "," << current.is_foraging << "," << recent.is_foraging << ","

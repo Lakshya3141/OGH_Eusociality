@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << std::fixed;
     std::cout << std::setprecision(2);
-    myPop.simulate_tst(csv_folder);
+    myPop.simulate_tst(myPop.p.param_names_to_record, csv_folder);
 
     auto end = std::chrono::high_resolution_clock::now();
     auto diff = end - start;
@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
     
     std::cout << std::fixed;
     std::cout << std::setprecision(2);
-    lastGen.simulate_LastOfUs(csv_folder);
+    lastGen.simulate_LastOfUs(myPop.p.param_names_to_record, csv_folder);
 
     auto end2 = std::chrono::high_resolution_clock::now();
     auto diff2 = end2 - start2;
