@@ -322,7 +322,7 @@ Population Population::initialise_LastOfUs() {
     // Initialise new population with selected females;
     Population newGen(p);
     // LCIMP No mutation happening in the Last of Us generation
-    newGen.p.dMutEffect = 0.00001;
+    newGen.p.dMutRate = 0.0;
     // clear vectors
     // newGen.adult_males = newPop_males;
 
