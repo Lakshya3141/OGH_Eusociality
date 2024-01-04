@@ -1,2 +1,0 @@
--> increased gevolution time from 100,000 to 500,000 and also implemented the hard threshold
--> for maturation. dForaging mean is 0.5 and std is 0.2.

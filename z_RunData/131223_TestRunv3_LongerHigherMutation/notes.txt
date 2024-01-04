@@ -1,2 +1,0 @@
--> increased gevolution time from 100,000 to 1,000,000, mutation rate to 3% and step to 0.10
--> for maturation. dForaging mean is 1.0 and std is 0.5. Also initDispersal -5, maleLambda 0.01

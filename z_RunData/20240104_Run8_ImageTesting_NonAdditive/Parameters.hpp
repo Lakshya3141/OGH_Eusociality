@@ -15,8 +15,8 @@
 #include <algorithm>
 
 double gtime = 0.0;                     // Global time
-double max_gtime_evolution = 10000.0;     // 100000.0 
-double max_gtime_LastOfUs = 500.0;  // 500;              // Maximum for last of us generation
+double max_gtime_evolution = 700000.0;     // 100000.0 
+double max_gtime_LastOfUs = 10000.0;  // 500;              // Maximum for last of us generation
 double dMaleRemovalTime = 100.0;         // every time unit males are removed
 double dLarvalRemovalTime = 100.0;       // every this time unit dead larvae are removed
 double dOutputTimeInterval = 10.0;      // population state output time interval
@@ -27,7 +27,7 @@ double dInitDispersal = -5.0;          // Initial value of the dispersal gene
 // Logistic expression looks like 1/(1+exp(a+b*x))
 double dInitChoiceIntercept = 0.0;    // Initial value of parameter a in task choice logistic expression
 double dInitChoiceSlope = 0.0;       // Initial value of parameter b in task choice logistic expression
-bool bIsAdditive = true;            // gene expression is additive if true, otherwise only one is expressed
+bool bIsAdditive = false;            // gene expression is additive if true, otherwise only one is expressed
 bool bRecombLocus = true;           // 0.5 recombination chance of each locus of every gene if true
                                     // else recombination is genewise
 

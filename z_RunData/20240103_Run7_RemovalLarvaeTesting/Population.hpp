@@ -388,7 +388,7 @@ void Population::simulate_LastOfUs(const std::vector<std::string>& param_names, 
         csv_file << i << ',';
     }
     
-    csv_file << "event,gtime,nest_id,ind_id,mom_id,dad_id,is_mated,mate_id,current_foraging,next_foraging,num_choices,num_foraging,num_female_larva,num_larva,t_birth,is_alive,t_death,dispersal,choice_int,choice_slope,num_femlarva,num_malelarva,num_adults"<<std::endl;
+    csv_file << "event,gtime,nest_id,ind_id,mom_id,dad_id,is_mated,mate_id,current_foraging,next_foraging,num_choices,num_foraging,,num_female_larva,num_larva,t_birth,is_alive,t_death,dispersal,choice_int,choice_slope,num_femlarva,num_malelarva,num_adults"<<std::endl;
 
     unsigned long int event = 0;
 
