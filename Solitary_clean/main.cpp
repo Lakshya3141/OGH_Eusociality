@@ -28,20 +28,6 @@ int main(int argc, char* argv[]) {
 
     params sim_par_in(file_name);
 
-    // Create CSV output folder
-    std::string csv_folder = "OutputCSV";
-    if (!fs::exists(csv_folder)) {
-        try {
-            fs::create_directory(csv_folder);
-            std::cout << "Folder created successfully." << std::endl;
-        } catch (const std::filesystem::filesystem_error& e) {
-            std::cerr << "Error creating folder: " << e.what() << std::endl;
-            return 1;
-        }
-    } else {
-        std::cout << "Folder already exists." << std::endl;
-    }
-
     // Create Images output folder
     std::string images_folder = "OutputImages";
     if (!fs::exists(images_folder)) {
@@ -63,7 +49,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << std::fixed;
     std::cout << std::setprecision(2);
-    myPop.simulate_tst(myPop.p.param_names_to_record, csv_folder);
+    myPop.simulate_tst(myPop.p.param_names_to_record);
 
     auto end = std::chrono::high_resolution_clock::now();
     auto diff = end - start;
@@ -78,7 +64,7 @@ int main(int argc, char* argv[]) {
     
     std::cout << std::fixed;
     std::cout << std::setprecision(2);
-    lastGen.simulate_LastOfUs(myPop.p.param_names_to_record, csv_folder);
+    lastGen.simulate_LastOfUs(myPop.p.param_names_to_record);
 
     auto end2 = std::chrono::high_resolution_clock::now();
     auto diff2 = end2 - start2;

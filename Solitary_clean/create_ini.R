@@ -18,7 +18,7 @@ create_config <- function(config_file_name = "config.ini",
                           dForagingMean = 1.0,
                           dForagingSD = 0.5,
                           const_sex_ratio = 0.5,
-                          params_to_record = "dForagingSD") {
+                          params_to_record = "dForagingSD,dForagingMean") {
   
   newini <- list()
   newini[["params"]] <-

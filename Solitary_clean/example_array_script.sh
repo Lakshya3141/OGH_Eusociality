@@ -22,6 +22,10 @@ cd $parSet
 cp ../myprog .
 cp ../create_sim_script.R .
 cp ../create_ini.R .
+cp ../analysis_evolution.R .
+cp ../analysis_LastOfUs.R .
 Rscript create_sim_script.R ${parSet}
 chmod +x myprog
 ./myprog config.ini
+Rscript analysis_evolution.R
+Rscript analysis_LastOfUs.R

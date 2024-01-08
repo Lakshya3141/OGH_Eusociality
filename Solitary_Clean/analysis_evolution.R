@@ -4,7 +4,16 @@ library(gridExtra)
 library(patchwork)
 
 
-data <- read.csv("OutputCSV/evolution.csv")
+directory <- getwd()
+files <- list.files(directory, pattern = "_evolution.csv", full.names = TRUE)
+
+# Loop through each file
+for (file in files) {
+  # Extract simulation ID from the filename
+  simulationID <- as.numeric(str_extract(file, "\\d+"))
+  data <- read.csv(file)
+  cat("Analysing evolution for simulation ID:", simulationID, "\n")
+}
 
 # Create output folder if not exists
 dir.create("OutputImages", showWarnings = FALSE)

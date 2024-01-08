@@ -47,9 +47,9 @@ public:
     void removeDeadLarva();                         // LD to remove dead larva
     int findIndexByNestId(unsigned int nestId);     // returns index of Nest ID in nests vector
 
-    void simulate_tst(const std::vector<std::string>& param_names, const std::string& output_folder);                            // simulate function
+    void simulate_tst(const std::vector<std::string>& param_names);                            // simulate function
     Population initialise_LastOfUs();                       // initialise the last generation as per output testing discussed
-    void simulate_LastOfUs(const std::vector<std::string>& param_names, const std::string& output_folder);
+    void simulate_LastOfUs(const std::vector<std::string>& param_names);
     void printPopulationState(const std::vector< float >& param_values, std::ostream& csv_file, const unsigned long int event);  // add row of data to population state file
     
     unsigned int nest_id_counter = 0;               // nest ID counter 
@@ -103,7 +103,7 @@ int Population::findIndexByNestId(unsigned int nestId) {
     }
 
 // Simulate function for initalised population
-void Population::simulate_tst(const std::vector<std::string>& param_names, const std::string& output_folder) {
+void Population::simulate_tst(const std::vector<std::string>& param_names) {
     // Create a priority queue to track individuals by their next action time
     std::priority_queue<track_time, std::vector<track_time>, decltype(cmptime)> event_queue(cmptime);
     // Initialize the event queue with individuals and their initial next action times
@@ -113,7 +113,8 @@ void Population::simulate_tst(const std::vector<std::string>& param_names, const
         }
     }
 
-    fs::path filePath = fs::path(output_folder) / "evolution.csv";
+    // fs::path filePath = fs::path(output_folder) / "evolution.csv";
+    fs::path filePath = fs::path(std::to_string(simulationID) + "_evolution.csv");
 
     std::ofstream csv_file(filePath);
     
@@ -268,8 +269,8 @@ void Population::simulate_tst(const std::vector<std::string>& param_names, const
     }
     csv_file.close();
 
-    filePath = fs::path(output_folder) / std::to_string(simulationID);
-    std::ofstream(filePath.c_str());
+    // filePath = fs::path(output_folder) / std::to_string(simulationID);
+    // std::ofstream(filePath.c_str());
 }
 
 
@@ -368,7 +369,7 @@ Population Population::initialise_LastOfUs() {
 }
 
 // Function to simulate the last generation until death of all colonies or a certain event time period
-void Population::simulate_LastOfUs(const std::vector<std::string>& param_names, const std::string& output_folder){
+void Population::simulate_LastOfUs(const std::vector<std::string>& param_names){
     // Create a priority queue to track individuals by their next action time
     std::priority_queue<track_time, std::vector<track_time>, decltype(cmptime)> event_queue(cmptime);
 
@@ -379,8 +380,9 @@ void Population::simulate_LastOfUs(const std::vector<std::string>& param_names, 
         }
     }
 
-    fs::path filePath = fs::path(output_folder) / "LastOfUs.csv";
-
+    // fs::path filePath = fs::path(output_folder) / "LastOfUs.csv";
+    fs::path filePath = fs::path(std::to_string(simulationID) + "_LastOfUs.csv");
+    
     std::ofstream csv_file(filePath);
     // TST add nest female size as well (larval vectors size also)
     
