@@ -51,7 +51,8 @@ public:
     Population initialise_LastOfUs();                       // initialise the last generation as per output testing discussed
     void simulate_LastOfUs(const std::vector<std::string>& param_names);
     void printPopulationState(const std::vector< float >& param_values, std::ostream& csv_file, const unsigned long int event);  // add row of data to population state file
-    
+    void printDeadIndividualData(const std::vector< float >& param_values, std::ostream& csv_file); // add row of data to deadIndividual file
+
     unsigned int nest_id_counter = 0;               // nest ID counter 
     unsigned int individual_id_counter = 0;         // individual ID counter
     
@@ -61,7 +62,13 @@ public:
 private:
     double last_dead_male_removal_time = 0.0;
     double last_dead_larval_removal_time = 0.0;
-    double last_output_time = 0.0;
+    double last_evolution_time = 0.0;
+    double last_deadInd_time = 0.0;
+    std::vector<std::tuple<double, double, double, double, unsigned int> > deadInd_data;
+    double frac_ind_dot_plot = 0.005; // LDP
+    // LDP -> a vector, where each row is an individual that died and was accepted for data output
+    // with bernoulli (frac_ind_dot_plot). The tuple is of the format
+    // gtime, pertime_foraging, pertask_foraging,  num_choices, nest_id
 };
 
 auto cmptime = [](const track_time& a, const track_time& b) { return a.time > b.time; };
@@ -113,17 +120,19 @@ void Population::simulate_tst(const std::vector<std::string>& param_names) {
         }
     }
 
-    // fs::path filePath = fs::path(output_folder) / "evolution.csv";
-    fs::path filePath = fs::path(std::to_string(simulationID) + "_evolution.csv");
+    fs::path evolutionPath = fs::path(std::to_string(simulationID) + "_evolution.csv");
+    std::ofstream evolution_file(evolutionPath);
 
-    std::ofstream csv_file(filePath);
+    fs::path deadindPath = fs::path(std::to_string(simulationID) + "_deadIndividuals.csv");
+    std::ofstream di_file(deadindPath);
     
     for (auto i : param_names) {
-        csv_file << i << ',';
+        evolution_file << i << ',';
+        di_file << i << ',';
     }
     
-    csv_file << "gtime,event,choice_int_avg,choice_int_std,choice_slope_avg,choice_slope_std,dispersal_avg,dispersal_std,num_female,num_male,fem_avg,fem_std,femLarv_avg,femLarv_std,malLarv_avg,malLarv_std,totLarv_avg,totLarv_std" <<std::endl;
-
+    evolution_file << "gtime,event,choice_int_avg,choice_int_std,choice_slope_avg,choice_slope_std,dispersal_avg,dispersal_std,num_female,num_male,fem_avg,fem_std,femLarv_avg,femLarv_std,malLarv_avg,malLarv_std,totLarv_avg,totLarv_std" <<std::endl;
+    di_file << "gtime,pertime_foraging,pertask_foraging,num_choices,nest_id" << std::endl;
     unsigned long int event = 0;
 
     // Simulate till max_gtime_evolution
@@ -140,8 +149,8 @@ void Population::simulate_tst(const std::vector<std::string>& param_names) {
         removeDeadLarva();
 
         // output
-        printPopulationState(p.params_to_record, csv_file, event);
-
+        printPopulationState(p.params_to_record, evolution_file, event);
+        printDeadIndividualData(p.params_to_record, di_file);
         // Get the individual with the earliest next action time, pop it from queue
         // find nest index (cnestid) based on event's nest ID and individual ID (cindid)
         // Find index of current indidvidual in it's respective next
@@ -262,15 +271,25 @@ void Population::simulate_tst(const std::vector<std::string>& param_names) {
         
         } // Death condition 
         else {
+            // sampling dead individuals for the output deadIndividual file
+            if (bernoulli(frac_ind_dot_plot)) {
+                // gtime, pertime_foraging, pertask_foraging,  num_choices, nest_id
+                current.num_choices = static_cast<double>(current.num_choices);
+                current.num_foraging = static_cast<double>(current.num_foraging);
+                double tot_time = p.dForagingTime*current.num_foraging + (p.dBroodingTime*(current.num_choices - current.num_foraging));
+                double pertime_foraging = p.dForagingTime*current.num_foraging / (tot_time);
+                double pertask_foraging = static_cast<double>(current.num_foraging)/static_cast<double>(current.num_choices)*100.0;
+                auto dummy = std::make_tuple(current.t_next, pertime_foraging, pertask_foraging, current.num_choices, current.nest_id);
+                deadInd_data.push_back(dummy);
+            }
+
             remove_from_vec(nests[cnestid].adult_females, current_index);
         }
 
         event++;
     }
-    csv_file.close();
-
-    // filePath = fs::path(output_folder) / std::to_string(simulationID);
-    // std::ofstream(filePath.c_str());
+    evolution_file.close();
+    di_file.close();
 }
 
 
@@ -380,17 +399,15 @@ void Population::simulate_LastOfUs(const std::vector<std::string>& param_names){
         }
     }
 
-    // fs::path filePath = fs::path(output_folder) / "LastOfUs.csv";
-    fs::path filePath = fs::path(std::to_string(simulationID) + "_LastOfUs.csv");
-    
-    std::ofstream csv_file(filePath);
+    fs::path louPath = fs::path(std::to_string(simulationID) + "_LastOfUs.csv");
+    std::ofstream lou_file(louPath);
     // TST add nest female size as well (larval vectors size also)
     
     for (auto i : param_names) {
-        csv_file << i << ',';
+        lou_file << i << ',';
     }
     
-    csv_file << "event,gtime,nest_id,ind_id,mom_id,dad_id,is_mated,mate_id,current_foraging,next_foraging,num_choices,num_foraging,num_female_larva,num_larva,t_birth,is_alive,t_death,dispersal,choice_int,choice_slope,num_femlarva,num_malelarva,num_adults"<<std::endl;
+    lou_file << "event,gtime,nest_id,ind_id,mom_id,dad_id,is_mated,mate_id,current_foraging,next_foraging,num_choices,num_foraging,num_female_larva,num_larva,t_birth,is_alive,t_death,dispersal,choice_int,choice_slope,num_femlarva,num_malelarva,num_adults"<<std::endl;
 
     unsigned long int event = 0;
 
@@ -496,10 +513,10 @@ void Population::simulate_LastOfUs(const std::vector<std::string>& param_names){
         }
 
         Individual<2>& cf{nests[cnestid].adult_females[current_index]};
-        nests[current.nest_id].printIndividualEventCSV(p.params_to_record, csv_file, current, cf, event);
+        nests[current.nest_id].printIndividualEventCSV(p.params_to_record, lou_file, current, cf, event);
         event++;
     }
-    csv_file.close();
+    lou_file.close();
 }
 
 // returns index of selected random male
@@ -585,7 +602,7 @@ void Population::removeDeadLarva() {
 // function to print population state compared to gtime
 void Population::printPopulationState(const std::vector< float >& param_values, std::ostream& csv_file, const unsigned long int event) {
     // Check if enough time has passed since the last removal
-    if (gtime - last_output_time < dOutputTimeInterval) {
+    if (gtime - last_evolution_time < dOutputTimeInterval) {
         return; // Skip removal if not enough time has passed
     }
     // csv_file << "gtime,event,choice_int_avg,choice_int_std,choice_slope_avg,choice_slope_std,
@@ -657,10 +674,33 @@ void Population::printPopulationState(const std::vector< float >& param_values, 
     // End the CSV line
     csv_file << "\n";
     // Update the last removal time
-    last_output_time = gtime;
+    last_evolution_time = gtime;
 
 }
 
+
+// function to print dead individual data and clear the vector
+void Population::printDeadIndividualData(const std::vector< float >& param_values, std::ostream& csv_file) {
+    // Check if enough time has passed since the last removal
+    if (gtime - last_deadInd_time < dOutputTimeInterval) {
+        return; // Skip removal if not enough time has passed
+    }
+    // gtime, pertime_foraging, pertask_foraging,  num_choices, nest_id
+
+    for(auto dInd : deadInd_data){
+        for (auto i : param_values) {
+            csv_file << i << ',';
+        }
+        csv_file << gtime << "," << std::get<1>(dInd) << ","
+        << std::get<2>(dInd) << "," << std::get<3>(dInd) << ","
+        << std::get<4>(dInd) << std::endl;
+    }
+    
+    // Update the last removal time
+    last_deadInd_time = gtime;
+    deadInd_data.clear();
+
+}
 
 // Print individual details for debugging TST
 template<int Ploidy>

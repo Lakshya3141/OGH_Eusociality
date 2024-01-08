@@ -28,20 +28,6 @@ int main(int argc, char* argv[]) {
 
     params sim_par_in(file_name);
 
-    // Create Images output folder
-    std::string images_folder = "OutputImages";
-    if (!fs::exists(images_folder)) {
-        try {
-            fs::create_directory(images_folder);
-            std::cout << "Folder created successfully." << std::endl;
-        } catch (const std::filesystem::filesystem_error& e) {
-            std::cerr << "Error creating folder: " << e.what() << std::endl;
-            return 1;
-        }
-    } else {
-        std::cout << "Folder already exists." << std::endl;
-    }
-
     auto start = std::chrono::high_resolution_clock::now();
     
     Population myPop(sim_par_in);
