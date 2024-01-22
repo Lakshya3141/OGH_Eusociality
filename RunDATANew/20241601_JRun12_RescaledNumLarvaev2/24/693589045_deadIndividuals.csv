@@ -1,0 +1,4 @@
+dBroodingTime,dForagingTime,dDeathTime,gtime,pertime_foraging,num_foraging,num_choices,nest_id,dispersal,beta0,beta1,beta2,beta3,beta4,beta5
+20,12,12,2288.01,0.381625,36,71,2039,-5,0,0,0,0,0
+20,12,12,3796.01,0.369501,42,85,3250,-5,0.00773674,0.00291152,0.00289402,0,0
+20,12,12,5304.01,0.337349,28,61,5029,-5,0,0,0,0,0

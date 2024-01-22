@@ -1,0 +1,125 @@
+
+The following have been reloaded with a version change:
+  1) Brotli/1.0.9-GCCcore-12.3.0 => Brotli/1.0.9-GCCcore-12.2.0
+  2) GCCcore/12.3.0 => GCCcore/12.2.0
+  3) GLib/2.77.1-GCCcore-12.3.0 => GLib/2.75.0-GCCcore-12.2.0
+  4) HarfBuzz/5.3.1-GCCcore-12.3.0 => HarfBuzz/5.3.1-GCCcore-12.2.0
+  5) ICU/73.2-GCCcore-12.3.0 => ICU/72.1-GCCcore-12.2.0
+  6) LLVM/16.0.6-GCCcore-12.3.0 => LLVM/15.0.5-GCCcore-12.2.0
+  7) Mesa/23.1.4-GCCcore-12.3.0 => Mesa/22.2.4-GCCcore-12.2.0
+  8) NASM/2.16.01-GCCcore-12.3.0 => NASM/2.15.05-GCCcore-12.2.0
+  9) PCRE2/10.42-GCCcore-12.3.0 => PCRE2/10.40-GCCcore-12.2.0
+ 10) X11/20230603-GCCcore-12.3.0 => X11/20221110-GCCcore-12.2.0
+ 11) XZ/5.4.2-GCCcore-12.3.0 => XZ/5.2.7-GCCcore-12.2.0
+ 12) bzip2/1.0.8-GCCcore-12.3.0 => bzip2/1.0.8-GCCcore-12.2.0
+ 13) cairo/1.17.8-GCCcore-12.3.0 => cairo/1.17.4-GCCcore-12.2.0
+ 14) expat/2.5.0-GCCcore-12.3.0 => expat/2.4.9-GCCcore-12.2.0
+ 15) fontconfig/2.14.2-GCCcore-12.3.0 => fontconfig/2.14.1-GCCcore-12.2.0
+ 16) freetype/2.13.0-GCCcore-12.3.0 => freetype/2.12.1-GCCcore-12.2.0
+ 17) gettext/0.21.1-GCCcore-12.3.0 => gettext/0.21.1-GCCcore-12.2.0
+ 18) gzip/1.12-GCCcore-12.3.0 => gzip/1.12-GCCcore-12.2.0
+ 19) libGLU/9.0.3-GCCcore-12.3.0 => libGLU/9.0.2-GCCcore-12.2.0
+ 20) libdrm/2.4.115-GCCcore-12.3.0 => libdrm/2.4.114-GCCcore-12.2.0
+ 21) libevent/2.1.12-GCCcore-12.3.0 => libevent/2.1.12-GCCcore-12.2.0
+ 22) libffi/3.4.4-GCCcore-12.3.0 => libffi/3.4.4-GCCcore-12.2.0
+ 23) libglvnd/1.6.0-GCCcore-12.3.0 => libglvnd/1.6.0-GCCcore-12.2.0
+ 24) libjpeg-turbo/2.1.5.1-GCCcore-12.3.0 => libjpeg-turbo/2.1.4-GCCcore-12.2.0
+ 25) libpciaccess/0.17-GCCcore-12.3.0 => libpciaccess/0.17-GCCcore-12.2.0
+ 26) libpng/1.6.39-GCCcore-12.3.0 => libpng/1.6.38-GCCcore-12.2.0
+ 27) libunwind/1.6.2-GCCcore-12.3.0 => libunwind/1.6.2-GCCcore-12.2.0
+ 28) libxml2/2.11.4-GCCcore-12.3.0 => libxml2/2.10.3-GCCcore-12.2.0
+ 29) lz4/1.9.4-GCCcore-12.3.0 => lz4/1.9.4-GCCcore-12.2.0
+ 30) ncurses/6.4-GCCcore-12.3.0 => ncurses/6.3-GCCcore-12.2.0
+ 31) pixman/0.42.2-GCCcore-12.3.0 => pixman/0.42.2-GCCcore-12.2.0
+ 32) util-linux/2.39-GCCcore-12.3.0 => util-linux/2.38.1-GCCcore-12.2.0
+ 33) xorg-macros/1.20.0-GCCcore-12.3.0 => xorg-macros/1.19.3-GCCcore-12.2.0
+ 34) zlib/1.2.13-GCCcore-12.3.0 => zlib/1.2.12-GCCcore-12.2.0
+ 35) zstd/1.5.5-GCCcore-12.3.0 => zstd/1.5.2-GCCcore-12.2.0
+
+
+The following have been reloaded with a version change:
+  1) GCCcore/12.2.0 => GCCcore/11.2.0
+
+
+The following have been reloaded with a version change:
+  1) GCCcore/11.2.0 => GCCcore/12.3.0
+
+Global Parameters:
+max_gtime_evolution = 1e+06
+max_gtime_LastOfUs = 10000
+dMaleRemovalTime = 100
+dOutputTimeInterval = 50
+max_nests_evolution = 1000
+max_nests_LastOfUs = 25
+dInitDispersal = -5
+Simulation ID = 2266800834
+Is Additive = 1
+Locuswise recombination = 1
+Time is discrete = 1
+
+Reading from config file: config.ini
+dLarvaMatureSize = 1
+dForagingTime = 12
+dBroodingTime = 20
+dForagingTimeSD = 1
+dBroodingTimeSD = 1
+dDeathTime = 12
+dMaleLambda = 0.01
+dLarvaeLambda = 0.01
+dMutRate = 0.03
+dMutBias = 0
+dMutEffect = 0.02
+dSurvForage = 0.98
+dSurvBrood = 0.99
+dForagingMean = 1
+dForagingSD = 0.5
+const_sex_ratio = 0.5
+params_to_record = dBroodingTime,dForagingTime,dDeathTime
+
+Initial population simulation took 55.80 seconds
+
+STARTING last of us
+ERROR: event_queue empty
+
+Last of Us simulation took 0.01 seconds
+
+
+###############################################################################
+Hábrók Cluster
+Job 6883230_24 for user s5381029
+Finished at: Wed Jan 17 10:32:03 CET 2024
+
+Job details:
+============
+
+Job ID              : 6883230_24
+Name                : SecondRound
+User                : s5381029
+Partition           : regularshort
+Nodes               : node45
+Number of Nodes     : 1
+Cores               : 1
+Number of Tasks     : 1
+State               : COMPLETED
+Submit              : 2024-01-17T10:30:31
+Start               : 2024-01-17T10:30:32
+End                 : 2024-01-17T10:32:03
+Reserved walltime   : 05:00:00
+Used walltime       : 00:01:31
+Used CPU time       : 00:01:23 (efficiency: 92.12%)
+% User (Computation): 97.09%
+% System (I/O)      :  2.91%
+Mem reserved        : 11G
+Max Mem (Node/step) : 411.19M (node45, per node)
+Full Max Mem usage  : 411.19M
+Total Disk Read     : 113.86M
+Total Disk Write    : 563.94M
+
+Acknowledgements:
+=================
+
+Please see this page for information about acknowledging Hábrók in your publications:
+
+https://wiki.hpc.rug.nl/habrok/introduction/scientific_output
+
+################################################################################
