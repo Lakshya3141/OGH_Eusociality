@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "iostream": "cpp",
-        "queue": "cpp",
-        "dense": "cpp",
-        "iosfwd": "cpp",
-    },
-    "cmake.generator": "MinGW Makefiles"
-}
